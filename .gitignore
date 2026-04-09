@@ -1,0 +1,52 @@
+## .NET / C#
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+.vscode/
+*.swp
+
+## Sensitive config — never commit production secrets
+appsettings.Production.json
+appsettings.Staging.json
+
+## EF Core tools
+*.db
+*.db-journal
+
+## NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Build outputs
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+## JetBrains Rider
+.idea/
+*.sln.iml
+
+## LibMan restore target (restored at build time)
+src/BlindMatch.Web/wwwroot/lib/
