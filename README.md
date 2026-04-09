@@ -1,5 +1,5 @@
 # BlindMatch — Project Approval System
-### PUSL2020 Software Development Tools and Practices | 2026–2027
+### PUSL2020 Software Development Tools and Practices
 
 A secure, web-based **Blind-Match Project Approval System (PAS)** that facilitates fair matching of student research projects with academic supervisors.
 
@@ -76,10 +76,3 @@ dotnet run --project src/BlindMatch.Web
 dotnet test
 ```
 
----
-
-## Group Members
-
-| Name | Role |
-|---|---|
-| TBA | TBA |
