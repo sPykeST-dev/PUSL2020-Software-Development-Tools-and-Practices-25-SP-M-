@@ -1,3 +1,4 @@
+using BlindMatch.Infrastructure.Identity;
 using BlindMatch.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,9 @@ namespace BlindMatch.Infrastructure.DependencyInjection
                 options.Password.RequiredLength = 8;
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            .AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>();
+            
 
             // Repositories and other scoped services will be registered here later
             
