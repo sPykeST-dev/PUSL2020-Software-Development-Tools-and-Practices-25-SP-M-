@@ -1,4 +1,6 @@
+using BlindMatch.Infrastructure.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
