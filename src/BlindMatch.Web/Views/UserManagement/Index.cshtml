@@ -1,0 +1,92 @@
+@model BlindMatch.Web.ViewModels.UserListViewModel
+@using BlindMatch.Core.Common
+@{
+    ViewData["Title"] = "User management";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h4 mb-0">User management</h1>
+    <a asp-action="Create" class="btn btn-primary btn-sm">+ Add user</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td>@user.FullName</td>
+                    <td>@user.Email</td>
+                    <td>
+                        <span class="badge bg-secondary">@user.Role</span>
+                    </td>
+                    <td>
+                        @if (user.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Deactivated</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        <div class="d-flex gap-2 justify-content-end">
+
+                            <form asp-action="ChangeRole" method="post" class="d-flex gap-1">
+                                <input type="hidden" name="UserId" value="@user.Id" />
+                                <select name="NewRole" class="form-select form-select-sm" style="width: auto">
+                                    <option value="@Roles.Supervisor"
+                                            selected="@(user.Role == Roles.Supervisor ? "selected" : null)">
+                                        Supervisor
+                                    </option>
+                                    <option value="@Roles.ModuleLeader"
+                                            selected="@(user.Role == Roles.ModuleLeader ? "selected" : null)">
+                                        Module Leader
+                                    </option>
+                                    <option value="@Roles.SystemAdministrator"
+                                            selected="@(user.Role == Roles.SystemAdministrator ? "selected" : null)">
+                                        Admin
+                                    </option>
+                                </select>
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                    Change role
+                                </button>
+                            </form>
+
+                            @if (user.IsActive)
+                            {
+                                <form asp-action="Deactivate" method="post">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm"
+                                            onclick="return confirm('Deactivate @user.FullName?')">
+                                        Deactivate
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="Reactivate" method="post">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="submit" class="btn btn-outline-success btn-sm">
+                                        Reactivate
+                                    </button>
+                                </form>
+                            }
+
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

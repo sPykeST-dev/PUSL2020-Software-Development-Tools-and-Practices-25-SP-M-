@@ -1,0 +1,71 @@
+@model BlindMatch.Web.ViewModels.CreateUserViewModel
+@using BlindMatch.Core.Common
+@{
+    ViewData["Title"] = "Add user";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <h1 class="h4 mb-2">Add new user</h1>
+        <p class="text-muted small mb-4">
+            Use this form to create Supervisor or Module Leader accounts.
+            Students self-register — do not create Student accounts here.
+        </p>
+
+        <form asp-action="Create" asp-controller="UserManagement" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <label asp-for="FirstName" class="form-label"></label>
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName" class="text-danger small"></span>
+                </div>
+                <div class="col">
+                    <label asp-for="LastName" class="form-label"></label>
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Role" class="form-label"></label>
+                <select asp-for="Role" class="form-select">
+                    <option value="">— select role —</option>
+                    <option value="@Roles.Supervisor">Supervisor</option>
+                    <option value="@Roles.ModuleLeader">Module Leader</option>
+                    <option value="@Roles.SystemAdministrator">System Administrator</option>
+                </select>
+                <span asp-validation-for="Role" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                <div class="form-text">
+                    At least 8 characters with an uppercase letter, number, and special character.
+                </div>
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Create account</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
