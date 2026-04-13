@@ -1,0 +1,55 @@
+@model SupervisorProfileViewModel
+
+@{
+    ViewData["Title"] = "Supervisor Profile";
+}
+
+<h1>My Profile</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Personal Information</h5>
+                <p><strong>Name:</strong> @Model.Supervisor.FullName</p>
+                <p><strong>Email:</strong> @Model.Supervisor.Email</p>
+                <p><strong>Department:</strong> @Model.Supervisor.Department</p>
+                <p><strong>Max Projects:</strong> @Model.Supervisor.MaxProjects</p>
+                <p><strong>Current Projects:</strong> @Model.Supervisor.CurrentProjects</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Research Areas</h5>
+                <p>Select the research areas you specialize in. This will help filter proposals on the browse page.</p>
+
+                <form method="post" action="@Url.Action("UpdateResearchAreas")">
+                    @Html.AntiForgeryToken()
+
+                    @foreach (var area in Model.AvailableResearchAreas)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="researchAreaIds" value="@area.Id"
+                                   id="area_@area.Id"
+                                   @(Model.SelectedResearchAreaIds.Contains(area.Id) ? "checked" : "")>
+                            <label class="form-check-label" for="area_@area.Id">
+                                @area.Name
+                            </label>
+                        </div>
+                    }
+
+                    <button type="submit" class="btn btn-primary mt-3">Update Research Areas</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="@Url.Action("Index", "SupervisorBrowse")" class="btn btn-primary">Browse Proposals</a>
+    <a href="@Url.Action("MyInterests", "Interest")" class="btn btn-secondary">My Interests</a>
+</div>

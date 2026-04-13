@@ -1,0 +1,64 @@
+@model List<MyInterestItemViewModel>
+
+@{
+    ViewData["Title"] = "My Interests";
+}
+
+<h1>My Interests</h1>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        You haven't expressed interest in any proposals yet.
+        <a href="@Url.Action("Index", "SupervisorBrowse")" class="alert-link">Browse proposals</a> to get started.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Project Code</th>
+                    <th>Title</th>
+                    <th>Research Area</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var interest in Model)
+                {
+                    <tr>
+                        <td>@interest.ProjectCode</td>
+                        <td>@interest.Title</td>
+                        <td>@interest.ResearchArea</td>
+                        <td>
+                            <span class="badge @(interest.Status == BlindMatch.Core.Enums.InterestStatus.Pending ? "bg-warning" : "bg-success")">
+                                @interest.Status
+                            </span>
+                        </td>
+                        <td>@interest.CreatedAt.ToString("d")</td>
+                        <td>
+                            @if (interest.CanConfirm)
+                            {
+                                <a href="@Url.Action("ConfirmInterest", new { id = interest.Id })" class="btn btn-primary btn-sm">
+                                    Confirm Interest
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Confirmed</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div class="mt-3">
+    <a href="@Url.Action("Index", "SupervisorBrowse")" class="btn btn-primary">Browse More Proposals</a>
+</div>

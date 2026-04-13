@@ -1,0 +1,43 @@
+@model ConfirmInterestViewModel
+
+@{
+    ViewData["Title"] = "Confirm Interest";
+}
+
+<h1>Confirm Interest</h1>
+
+<div class="alert alert-warning">
+    <h4>Warning: Identity Reveal</h4>
+    <p>Confirming your interest will reveal your identity to the student and create a binding match. This action cannot be undone.</p>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">@Model.ProjectCode: @Model.Title</h5>
+
+        <h6>Your Information (will be revealed to student):</h6>
+        <ul>
+            <li><strong>Name:</strong> @Model.SupervisorName</li>
+            <li><strong>Email:</strong> @Model.SupervisorEmail</li>
+            <li><strong>Department:</strong> @Model.SupervisorDepartment</li>
+        </ul>
+
+        <p class="text-muted">
+            Note: The student's identity will also be revealed to you upon confirmation.
+        </p>
+    </div>
+</div>
+
+<form method="post" class="mt-4">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="InterestId" value="@Model.InterestId" />
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success">
+            Confirm Interest & Reveal Identities
+        </button>
+        <a href="@Url.Action("MyInterests")" class="btn btn-secondary">
+            Cancel
+        </a>
+    </div>
+</form>

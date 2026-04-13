@@ -1,20 +1,17 @@
+// Stub interface - will be implemented by Member 2 with proper ASP.NET Identity types
 using BlindMatch.Core.Entities;
-using Microsoft.AspNetCore.Identity;
 
 namespace BlindMatch.Core.Interfaces;
 
 public interface IUserService
 {
-    Task<(IdentityResult Result, ApplicationUser? User)> CreateUserAsync(
-        string firstName, string lastName, string email, string password, string role,
-        string? programme = null, int? yearOfStudy = null);
-
-    Task<IdentityResult> AssignRoleAsync(ApplicationUser user, string role);
-    Task<IdentityResult> ChangeRoleAsync(string userId, string newRole);
-    Task<IdentityResult> DeactivateUserAsync(string userId);
-    Task<IdentityResult> ReactivateUserAsync(string userId);
-
-    Task<ApplicationUser?>             GetUserByIdAsync(string userId);
+    // Methods will be implemented by Member 2
+    Task<object> CreateUserAsync(string firstName, string lastName, string email, string password, string role, string? programme = null, int? yearOfStudy = null);
+    Task<object> AssignRoleAsync(ApplicationUser user, string role);
+    Task<object> ChangeRoleAsync(string userId, string newRole);
+    Task<object> DeactivateUserAsync(string userId);
+    Task<object> ReactivateUserAsync(string userId);
+    Task<ApplicationUser?> GetUserByIdAsync(string userId);
     Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
-    Task<string?>                      GetRoleAsync(ApplicationUser user);
+    Task<string?> GetRoleAsync(ApplicationUser user);
 }
