@@ -1,5 +1,7 @@
 using System.Linq.Expressions;
 using BlindMatch.Core.Interfaces.Repositories;
+using BlindMatch.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlindMatch.Infrastructure.Repositories;
 

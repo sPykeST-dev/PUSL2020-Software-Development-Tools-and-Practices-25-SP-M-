@@ -1,0 +1,17 @@
+@model BlindMatch.Web.ViewModels.Proposal.ProposalDetailsViewModel
+
+@{
+	ViewData["Title"] = "Withdraw Proposal";
+}
+
+<h2>Withdraw Proposal</h2>
+
+<div class="alert alert-warning">
+	Are you sure you want to withdraw the proposal <strong>@Model.Title</strong>?
+</div>
+
+<form asp-action="WithdrawConfirmed" method="post">
+	<input type="hidden" name="id" value="@Model.Id" />
+	<button type="submit" class="btn btn-danger">Yes, withdraw</button>
+	<a asp-action="Details" class="btn btn-outline-secondary">Cancel</a>
+</form>
