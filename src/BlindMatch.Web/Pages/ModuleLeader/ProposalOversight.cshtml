@@ -1,0 +1,60 @@
+@page "/module-leader/proposals"
+@model BlindMatch.Web.Pages.ModuleLeader.ProposalOversightModel
+@using BlindMatch.Core.Enums
+@{
+    ViewData["Title"] = "Proposal Oversight";
+}
+
+<h1 class="mb-4">Proposal Oversight</h1>
+
+<div class="mb-3">
+    <a class="btn btn-sm btn-outline-secondary" asp-page="" asp-route-filterStatus="">All</a>
+    <a class="btn btn-sm btn-outline-secondary" asp-page="" asp-route-filterStatus="@ProposalStatus.Draft">Draft</a>
+    <a class="btn btn-sm btn-outline-secondary" asp-page="" asp-route-filterStatus="@ProposalStatus.Submitted">Submitted</a>
+    <a class="btn btn-sm btn-outline-secondary" asp-page="" asp-route-filterStatus="@ProposalStatus.Matched">Matched</a>
+    <a class="btn btn-sm btn-outline-secondary" asp-page="" asp-route-filterStatus="@ProposalStatus.Rejected">Rejected</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Project</th>
+                <th>Title</th>
+                <th>Student</th>
+                <th>Area</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Proposals)
+            {
+                <tr>
+                    <td class="small">@p.ProjectCode</td>
+                    <td>@p.Title</td>
+                    <td><small>@p.StudentName<br />@p.StudentEmail</small></td>
+                    <td class="small">@p.ResearchArea</td>
+                    <td><span class="badge bg-secondary">@p.Status</span></td>
+                    <td class="small">@(p.SubmittedAt?.ToLocalTime().ToString("g") ?? "—")</td>
+                    <td>
+                        <form method="post" asp-page-handler="ChangeStatus" class="input-group input-group-sm">
+                            <input type="hidden" name="proposalId" value="@p.Id" />
+                            <select name="newStatus" class="form-select form-select-sm" required>
+                                <option value="">Change status</option>
+                                <option value="@ProposalStatus.Draft">Draft</option>
+                                <option value="@ProposalStatus.Submitted">Submitted</option>
+                                <option value="@ProposalStatus.UnderReview">Under Review</option>
+                                <option value="@ProposalStatus.Matched">Matched</option>
+                                <option value="@ProposalStatus.Rejected">Rejected</option>
+                                <option value="@ProposalStatus.Withdrawn">Withdrawn</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Change</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
