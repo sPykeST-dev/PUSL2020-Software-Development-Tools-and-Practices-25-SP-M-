@@ -1,0 +1,67 @@
+@model BlindMatch.Web.ViewModels.Proposal.ProposalDetailsViewModel
+
+@{
+	ViewData["Title"] = "Proposal Details";
+}
+
+<h2>Proposal Details</h2>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+	<div class="alert alert-success">@successMessage</div>
+}
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+	<div class="alert alert-danger">@errorMessage</div>
+}
+
+<dl class="row">
+	<dt class="col-sm-3">Title</dt>
+	<dd class="col-sm-9">@Model.Title</dd>
+
+	<dt class="col-sm-3">Abstract</dt>
+	<dd class="col-sm-9">@Model.Abstract</dd>
+
+	<dt class="col-sm-3">Technical Stack</dt>
+	<dd class="col-sm-9">@Model.TechnicalStack</dd>
+
+	<dt class="col-sm-3">Keywords</dt>
+	<dd class="col-sm-9">@Model.Keywords</dd>
+
+	<dt class="col-sm-3">Research Area</dt>
+	<dd class="col-sm-9">@Model.ResearchAreaName</dd>
+
+	<dt class="col-sm-3">Status</dt>
+	<dd class="col-sm-9">@Model.Status</dd>
+
+	<dt class="col-sm-3">Submitted At</dt>
+	<dd class="col-sm-9">@(Model.SubmittedAt?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")</dd>
+
+	<dt class="col-sm-3">Last Updated</dt>
+	<dd class="col-sm-9">@Model.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+
+	@if (Model.WithdrawnAt.HasValue)
+	{
+		<dt class="col-sm-3">Withdrawn At</dt>
+		<dd class="col-sm-9">@Model.WithdrawnAt.Value.ToString("yyyy-MM-dd HH:mm")</dd>
+	}
+</dl>
+
+<div class="mt-3 d-flex gap-2">
+	@if (Model.CanEdit)
+	{
+		<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+	}
+
+	@if (Model.CanWithdraw)
+	{
+		<a asp-action="Withdraw" asp-route-id="@Model.Id" class="btn btn-danger">Withdraw</a>
+	}
+
+	<a asp-action="Create" class="btn btn-outline-secondary">New Submission</a>
+</div>
+
+<p class="text-muted mt-3 mb-0">
+	Supervisor identity is hidden until reveal stage.
+</p>
