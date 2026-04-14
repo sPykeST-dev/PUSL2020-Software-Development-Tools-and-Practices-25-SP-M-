@@ -1,0 +1,66 @@
+@page "/admin/audit-log"
+@model BlindMatch.Web.Pages.Admin.AuditLogModel
+@{
+    ViewData["Title"] = "Audit Log";
+}
+
+<h1 class="mb-4">Audit Log</h1>
+
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h5>Filters</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Action</label>
+                <input type="text" name="actionFilter" class="form-control" placeholder="e.g. MatchApproved" value="@Model.ActionFilter" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">From</label>
+                <input type="datetime-local" name="startDate" class="form-control" value="@Model.StartDate?.ToString("yyyy-MM-ddTHH:mm")" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">To</label>
+                <input type="datetime-local" name="endDate" class="form-control" value="@Model.EndDate?.ToString("yyyy-MM-ddTHH:mm")" />
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a class="btn btn-outline-secondary" asp-page="">Clear</a>
+                <a class="btn btn-outline-success" asp-page-handler="ExportCsv" asp-route-actionFilter="@Model.ActionFilter" asp-route-startDate="@Model.StartDate" asp-route-endDate="@Model.EndDate">Export CSV</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<h4 class="mb-3">Events (@Model.ViewModel.Events.Count)</h4>
+@if (Model.ViewModel.Events.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var evt in Model.ViewModel.Events)
+                {
+                    <tr>
+                        <td class="small">@evt.Timestamp.ToLocalTime().ToString("g")</td>
+                        <td class="small">@evt.Who</td>
+                        <td><span class="badge bg-secondary">@evt.Action</span></td>
+                        <td class="small">@evt.Details</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="text-muted">No events match the filters.</p>
+}

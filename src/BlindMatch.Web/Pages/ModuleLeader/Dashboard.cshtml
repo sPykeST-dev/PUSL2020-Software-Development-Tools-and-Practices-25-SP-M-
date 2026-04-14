@@ -1,0 +1,84 @@
+@page "/module-leader/dashboard"
+@model BlindMatch.Web.Pages.ModuleLeader.DashboardModel
+@using BlindMatch.Core.Common
+@{
+    ViewData["Title"] = "Module Leader — Dashboard";
+}
+
+<h1 class="mb-4">Module Leader — Dashboard</h1>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Total Proposals</h6>
+                <h3 class="card-text">@Model.ViewModel.TotalProposals</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Pending Matches</h6>
+                <h3 class="card-text">@Model.ViewModel.PendingMatches</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Active Matches</h6>
+                <h3 class="card-text">@Model.ViewModel.ActiveMatches</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mb-3">Proposals by Status</h4>
+<table class="table table-sm table-hover mb-4">
+    <thead class="table-light">
+        <tr>
+            <th>Status</th>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var kv in Model.ViewModel.ProposalsByStatus)
+        {
+            <tr>
+                <td>@kv.Key</td>
+                <td class="fw-bold">@kv.Value</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4 class="mb-3">Recent Activity</h4>
+@if (Model.ViewModel.RecentActivity.Any())
+{
+    <table class="table table-sm table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>When</th>
+                <th>Who</th>
+                <th>Action</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ev in Model.ViewModel.RecentActivity)
+            {
+                <tr>
+                    <td class="small">@ev.When.ToLocalTime().ToString("g")</td>
+                    <td class="small">@ev.Who</td>
+                    <td class="small"><span class="badge bg-info">@ev.Action</span></td>
+                    <td class="small">@ev.Details</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-muted">No recent activity.</p>
+}

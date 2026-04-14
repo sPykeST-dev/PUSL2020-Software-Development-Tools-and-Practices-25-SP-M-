@@ -1,0 +1,75 @@
+@page "/module-leader/matches"
+@model BlindMatch.Web.Pages.ModuleLeader.MatchesModel
+@{
+    ViewData["Title"] = "Pending Matches";
+}
+
+<h1 class="mb-4">Pending Matches</h1>
+
+@if (!Model.PendingMatches.Any())
+{
+    <div class="alert alert-info">No pending matches to review.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Project</th>
+                    <th>Title</th>
+                    <th>Student</th>
+                    <th>Supervisor</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var match in Model.PendingMatches)
+                {
+                    <tr>
+                        <td class="small">@match.ProjectCode</td>
+                        <td>@match.ProposalTitle</td>
+                        <td>
+                            <small>@match.StudentName<br />@match.StudentEmail</small>
+                        </td>
+                        <td>
+                            <small>@match.SupervisorName<br />@match.SupervisorEmail<br />@match.SupervisorDepartment</small>
+                        </td>
+                        <td class="small">@match.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>
+                            <form method="post" asp-page-handler="Approve" class="d-inline">
+                                <input type="hidden" name="matchId" value="@match.Id" />
+                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                            </form>
+
+                            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#reject-@match.Id">Reject</button>
+
+                            <div id="reject-@match.Id" class="collapse mt-2 p-2 bg-light rounded">
+                                <form method="post" asp-page-handler="Reject">
+                                    <input type="hidden" name="matchId" value="@match.Id" />
+                                    <input type="text" name="rejectReason" class="form-control form-control-sm mb-2" placeholder="Reason (required)" required />
+                                    <button type="submit" class="btn btn-sm btn-danger">Confirm Reject</button>
+                                </form>
+                            </div>
+
+                            <div class="mt-2">
+                                <form method="post" asp-page-handler="Reassign" class="input-group input-group-sm">
+                                    <input type="hidden" name="matchId" value="@match.Id" />
+                                    <select name="newSupervisorId" class="form-select" required>
+                                        <option value="">Reassign to...</option>
+                                        @foreach (var sup in Model.AllSupervisors)
+                                        {
+                                            <option value="@sup.Id">@sup.FullName (@sup.Department)</option>
+                                        }
+                                    </select>
+                                    <button type="submit" class="btn btn-secondary">Reassign</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
