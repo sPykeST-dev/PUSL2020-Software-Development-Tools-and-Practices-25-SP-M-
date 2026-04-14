@@ -1,6 +1,7 @@
-// Stub implementation - will be completed by Member 3
 using BlindMatch.Core.Entities;
 using BlindMatch.Core.Interfaces.Repositories;
+using BlindMatch.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlindMatch.Infrastructure.Repositories;
 
@@ -10,5 +11,22 @@ public class ProposalRepository : Repository<Proposal>, IProposalRepository
     {
     }
 
-    // Methods will be implemented by Member 3
+    public async Task<Proposal?> GetByStudentIdAsync(string studentId)
+    {
+        return await _context.Proposals
+            .Include(p => p.ResearchArea)
+            .FirstOrDefaultAsync(p => p.StudentId == studentId);
+    }
+
+    public async Task<Proposal?> GetByIdForStudentAsync(int proposalId, string studentId)
+    {
+        return await _context.Proposals
+            .Include(p => p.ResearchArea)
+            .FirstOrDefaultAsync(p => p.Id == proposalId && p.StudentId == studentId);
+    }
+
+    public async Task<bool> StudentHasProposalAsync(string studentId)
+    {
+        return await _context.Proposals.AnyAsync(p => p.StudentId == studentId);
+    }
 }

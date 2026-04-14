@@ -4,6 +4,7 @@ using BlindMatch.Core.ValueObjects;
 using BlindMatch.Web.ViewModels.Browse;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BlindMatch.Web.Controllers;
 
@@ -68,7 +69,7 @@ public class SupervisorBrowseController : Controller
             ProjectCode = $"Project #{proposal.Id.ToString("D4")}",
             ResearchArea = proposal.ResearchArea.Name,
             Keywords = proposal.Keywords,
-            SubmittedAt = proposal.SubmittedAt ?? proposal.CreatedAt
+            SubmittedAt = proposal.SubmittedAt ?? proposal.UpdatedAt
         };
     }
 
@@ -83,7 +84,7 @@ public class SupervisorBrowseController : Controller
             TechnicalStack = proposal.TechnicalStack,
             Keywords = proposal.Keywords,
             ResearchArea = proposal.ResearchArea?.Name ?? "Unknown",
-            SubmittedAt = proposal.SubmittedAt ?? proposal.CreatedAt,
+            SubmittedAt = proposal.SubmittedAt ?? proposal.UpdatedAt,
             CanExpressInterest = true // Simplified - Member 5 will implement proper logic
         };
     }

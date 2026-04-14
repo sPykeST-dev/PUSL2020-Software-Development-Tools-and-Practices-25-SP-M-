@@ -1,6 +1,8 @@
 using BlindMatch.Core.Entities;
 using BlindMatch.Core.Enums;
 using BlindMatch.Core.Interfaces.Repositories;
+using BlindMatch.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlindMatch.Infrastructure.Repositories;
 

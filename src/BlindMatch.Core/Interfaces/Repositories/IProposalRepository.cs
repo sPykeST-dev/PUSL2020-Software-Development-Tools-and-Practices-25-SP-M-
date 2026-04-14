@@ -1,9 +1,10 @@
-// Stub interface - will be implemented by Member 3
 using BlindMatch.Core.Entities;
 
 namespace BlindMatch.Core.Interfaces.Repositories;
 
 public interface IProposalRepository : IRepository<Proposal>
 {
-    // Methods will be added by Member 3
+    Task<Proposal?> GetByStudentIdAsync(string studentId);
+    Task<Proposal?> GetByIdForStudentAsync(int proposalId, string studentId);
+    Task<bool> StudentHasProposalAsync(string studentId);
 }
