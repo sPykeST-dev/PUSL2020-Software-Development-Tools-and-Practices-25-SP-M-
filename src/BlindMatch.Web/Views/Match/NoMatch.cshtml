@@ -1,0 +1,74 @@
+@{
+    ViewData["Title"] = "No Match Yet";
+}
+
+<div class="container mt-4">
+    <h2>No Match Yet</h2>
+    <p class="text-muted">Your proposal has not been matched with a supervisor yet. Check back later.</p>
+    <a asp-controller="Proposal" asp-action="Index" class="btn btn-outline-secondary">Back to My Proposal</a>
+</div>
+```
+
+**`src/BlindMatch.Web/Views/Match/MySupervisedMatches.cshtml`** (create new file)
+
+```cshtml
+@model IEnumerable<BlindMatch.Web.ViewModels.Match.SupervisedMatchItemViewModel>
+@{
+    ViewData["Title"] = "My Supervised Projects";
+}
+
+<div class="container mt-4">
+    <h2>My Supervised Projects</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <p class="text-muted">You have no confirmed matches yet.</p>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>@item.ProposalTitle</span>
+                            <span class="badge bg-secondary">@item.MatchStatus</span>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Student</dt>
+                                <dd class="col-sm-8">@item.StudentFullName</dd>
+
+                                <dt class="col-sm-4">Email</dt>
+                                <dd class="col-sm-8">
+                                    <a href="mailto:@item.StudentEmail">@item.StudentEmail</a>
+                                </dd>
+
+                                @if (item.Programme != null)
+                                {
+                                    <dt class="col-sm-4">Programme</dt>
+                                    <dd class="col-sm-8">@item.Programme</dd>
+                                }
+
+                                @if (item.YearOfStudy.HasValue)
+                                {
+                                    <dt class="col-sm-4">Year</dt>
+                                    <dd class="col-sm-8">Year @item.YearOfStudy</dd>
+                                }
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

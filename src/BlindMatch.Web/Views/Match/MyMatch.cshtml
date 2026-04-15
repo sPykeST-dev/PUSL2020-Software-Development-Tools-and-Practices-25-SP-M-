@@ -1,0 +1,33 @@
+@model BlindMatch.Web.ViewModels.Match.MyMatchViewModel
+@{
+    ViewData["Title"] = "My Match";
+}
+
+<div class="container mt-4">
+    <h2>Your Project Match</h2>
+
+    <div class="alert alert-success">
+        <strong>Your proposal has been matched!</strong>
+        Your supervisor's contact details are shown below.
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Supervisor Details</div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@Model.SupervisorFullName</dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">
+                    <a href="mailto:@Model.SupervisorEmail">@Model.SupervisorEmail</a>
+                </dd>
+
+                <dt class="col-sm-3">Department</dt>
+                <dd class="col-sm-9">@Model.SupervisorDepartment</dd>
+            </dl>
+        </div>
+    </div>
+
+    <span class="badge bg-secondary">Match Status: @Model.MatchStatus</span>
+</div>
