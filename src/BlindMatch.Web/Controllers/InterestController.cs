@@ -1,10 +1,12 @@
 using BlindMatch.Core.Entities;
 using BlindMatch.Core.Interfaces.Repositories;
 using BlindMatch.Core.ValueObjects;
+using BlindMatch.Core.Common;
 using BlindMatch.Infrastructure.Services;
 using BlindMatch.Web.ViewModels.Interest;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BlindMatch.Web.Controllers;
 
@@ -13,13 +15,17 @@ public class InterestController : Controller
 {
     private readonly IInterestRepository _interestRepository;
     private readonly SupervisorService _supervisorService;
+    private readonly IBlindMatchService _blindMatchService;
 
     public InterestController(
         IInterestRepository interestRepository,
-        SupervisorService supervisorService)
+        SupervisorService supervisorService,
+        IBlindMatchService blindMatchService
+)
     {
         _interestRepository = interestRepository;
         _supervisorService = supervisorService;
+        _blindMatchService = blindMatchService;
     }
 
     public async Task<IActionResult> MyInterests()
@@ -86,20 +92,24 @@ public class InterestController : Controller
         return View(viewModel);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> ConfirmInterest(ConfirmInterestViewModel model)
-    {
-        var supervisorId = User.FindFirst("UserId")?.Value;
-        if (string.IsNullOrEmpty(supervisorId))
-        {
-            return Unauthorized();
-        }
+[HttpPost]
+[ValidateAntiForgeryToken]
+[Authorize(Policy = Policies.SupervisorOnly)]
+public async Task<IActionResult> ConfirmInterest(ConfirmInterestViewModel model)
+{
+    var supervisorId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-        // This will be implemented by Member 5 - Blind Match Engine
-        // For now, just redirect back
-        TempData["Info"] = "Confirm Interest functionality will be implemented by Member 5.";
-        return RedirectToAction("MyInterests");
+    var result = await _blindMatchService.ConfirmInterestAsync(model.InterestId, supervisorId);
+
+    if (!result.IsSuccess)
+    {
+        ModelState.AddModelError(string.Empty, result.Error!);
+        return View(model);
     }
+
+    TempData["SuccessMessage"] = "Match confirmed. Identities have been revealed. You can now see the student's details below.";
+    return RedirectToAction("MySupervisedMatches", "Match");
+}
 
     private MyInterestItemViewModel MapToViewModel(SupervisorInterest interest)
     {

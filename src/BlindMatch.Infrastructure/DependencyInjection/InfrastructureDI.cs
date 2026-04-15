@@ -24,11 +24,17 @@ public static class InfrastructureDI
         services.AddScoped<IStudentRepository, StudentRepository>();
         services.AddScoped<IInterestRepository, InterestRepository>();
         services.AddScoped<IProposalRepository, ProposalRepository>();
+        services.AddScoped<IMatchRepository, MatchRepository>();
+        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         // Other repositories will be added by other members
 
         // Services
         services.AddScoped<SupervisorService>();
         services.AddScoped<IProposalService, ProposalService>();
+        services.AddScoped<IBlindMatchService, BlindMatchService>();
+        services.AddScoped<IIdentityRevealService, IdentityRevealService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IAuditService, AuditService>();
         // Other services will be added by other members
 
         return services;
