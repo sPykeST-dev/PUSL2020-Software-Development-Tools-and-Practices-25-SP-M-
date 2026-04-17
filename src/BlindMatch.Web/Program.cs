@@ -47,7 +47,11 @@ using (var scope = app.Services.CreateScope())
         try
         {
             var db = services.GetRequiredService<ApplicationDbContext>();
-            await db.Database.MigrateAsync();
+            // InMemory provider (used in tests) doesn't support migrations
+            if (app.Environment.IsEnvironment("Testing"))
+                await db.Database.EnsureCreatedAsync();
+            else
+                await db.Database.MigrateAsync();
 
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             await RoleSeeder.SeedRolesAsync(roleManager);
@@ -93,3 +97,5 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+public partial class Program { }
