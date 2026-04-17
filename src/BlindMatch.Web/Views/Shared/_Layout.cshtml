@@ -1,6 +1,17 @@
 ﻿@using BlindMatch.Core.Common
 @{
     var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+    var displayName = "";
+    var roleLabel   = "";
+    if (isAuthenticated)
+    {
+        displayName = User.FindFirst(AppClaimTypes.FullName)?.Value ?? User.Identity?.Name ?? "";
+        roleLabel   = User.IsInRole(Roles.Student)            ? "Student"
+                    : User.IsInRole(Roles.Supervisor)          ? "Supervisor"
+                    : User.IsInRole(Roles.ModuleLeader)        ? "Module Leader"
+                    : User.IsInRole(Roles.SystemAdministrator) ? "Administrator"
+                    : "";
+    }
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -29,10 +40,10 @@
                 @if (isAuthenticated && User.IsInRole(Roles.Student))
                 {
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Proposal" asp-action="Index">My Proposal</a>
+                        <a class="nav-link" asp-controller="Proposal" asp-action="Details">My Proposal</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Proposal" asp-action="Status">My Status</a>
+                        <a class="nav-link" asp-controller="Match" asp-action="MyMatch">My Match</a>
                     </li>
                 }
 
@@ -45,6 +56,9 @@
                         <a class="nav-link" asp-controller="Interest" asp-action="MyInterests">My Interests</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" asp-controller="Match" asp-action="MySupervisedMatches">My Matches</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" asp-controller="Supervisor" asp-action="Profile">My Profile</a>
                     </li>
                 }
@@ -52,36 +66,47 @@
                 @if (isAuthenticated && User.IsInRole(Roles.ModuleLeader))
                 {
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                        <a class="nav-link" href="/module-leader/dashboard">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="ResearchArea" asp-action="Index">Research Areas</a>
+                        <a class="nav-link" href="/module-leader/matches">Matches</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/module-leader/proposal-oversight">Proposals</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/module-leader/research-areas">Research Areas</a>
                     </li>
                 }
 
                 @if (isAuthenticated && User.IsInRole(Roles.SystemAdministrator))
                 {
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="UserManagement" asp-action="Index">User Management</a>
+                        <a class="nav-link" asp-controller="UserManagement" asp-action="Index">Users</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="AuditLog" asp-action="Index">Audit Log</a>
+                        <a class="nav-link" href="/admin/audit-log">Audit Log</a>
                     </li>
                 }
 
             </ul>
 
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
                 @if (isAuthenticated)
                 {
-                    <li class="nav-item">
-                        <span class="nav-link text-light opacity-75 small">
-                            @User.Identity!.Name
-                        </span>
+                    <li class="nav-item d-flex align-items-center">
+                        <div class="navbar-vsep"></div>
+                        <div class="navbar-user">
+                            <span class="navbar-user-name">@displayName</span>
+                            @if (!string.IsNullOrEmpty(roleLabel))
+                            {
+                                <span class="navbar-user-role">@roleLabel</span>
+                            }
+                        </div>
                     </li>
                     <li class="nav-item">
                         <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-outline-light my-1">
+                            <button type="submit" class="nav-link btn btn-link signout-btn">
                                 Sign out
                             </button>
                         </form>
@@ -123,11 +148,6 @@
 
 </main>
 
-<footer class="border-top text-muted small py-3 mt-auto">
-    <div class="container text-center">
-        BlindMatch PAS &copy; @DateTime.Now.Year
-    </div>
-</footer>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

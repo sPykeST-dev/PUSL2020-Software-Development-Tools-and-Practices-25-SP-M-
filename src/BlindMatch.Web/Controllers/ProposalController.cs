@@ -19,6 +19,8 @@ public class ProposalController : Controller
 		_proposalService = proposalService;
 	}
 
+	public IActionResult Index() => RedirectToAction(nameof(Details));
+
 	public async Task<IActionResult> Details()
 	{
 		var studentId = GetCurrentStudentId();

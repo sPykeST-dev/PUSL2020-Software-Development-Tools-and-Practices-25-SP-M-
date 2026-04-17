@@ -2,65 +2,89 @@
 @model BlindMatch.Web.Pages.Admin.AuditLogModel
 @{
     ViewData["Title"] = "Audit Log";
+    var eventCount = Model.ViewModel.Events.Count;
 }
 
-<h1 class="mb-4">Audit Log</h1>
+<div class="page-header d-flex align-items-end justify-content-between flex-wrap gap-2">
+    <div>
+        <h1>Audit Log</h1>
+        <p>System activity and event history</p>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm mb-1"
+       asp-page-handler="ExportCsv"
+       asp-route-actionFilter="@Model.ActionFilter"
+       asp-route-startDate="@Model.StartDate"
+       asp-route-endDate="@Model.EndDate">
+        Export CSV
+    </a>
+</div>
 
 <div class="card mb-4">
-    <div class="card-header bg-light">
-        <h5>Filters</h5>
-    </div>
-    <div class="card-body">
-        <form method="get" class="row g-3">
+    <div class="card-header">Filters</div>
+    <div class="card-body p-4">
+        <form method="get" class="row g-3 align-items-end">
             <div class="col-md-4">
-                <label class="form-label">Action</label>
-                <input type="text" name="actionFilter" class="form-control" placeholder="e.g. MatchApproved" value="@Model.ActionFilter" />
+                <label style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.4rem;display:block">Action</label>
+                <input type="text" name="actionFilter" class="form-control form-control-sm"
+                       placeholder="e.g. MatchApproved" value="@Model.ActionFilter" />
             </div>
-            <div class="col-md-4">
-                <label class="form-label">From</label>
-                <input type="datetime-local" name="startDate" class="form-control" value="@Model.StartDate?.ToString("yyyy-MM-ddTHH:mm")" />
+            <div class="col-md-3">
+                <label style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.4rem;display:block">From</label>
+                <input type="datetime-local" name="startDate" class="form-control form-control-sm"
+                       value="@Model.StartDate?.ToString("yyyy-MM-ddTHH:mm")" />
             </div>
-            <div class="col-md-4">
-                <label class="form-label">To</label>
-                <input type="datetime-local" name="endDate" class="form-control" value="@Model.EndDate?.ToString("yyyy-MM-ddTHH:mm")" />
+            <div class="col-md-3">
+                <label style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.4rem;display:block">To</label>
+                <input type="datetime-local" name="endDate" class="form-control form-control-sm"
+                       value="@Model.EndDate?.ToString("yyyy-MM-ddTHH:mm")" />
             </div>
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Filter</button>
-                <a class="btn btn-outline-secondary" asp-page="">Clear</a>
-                <a class="btn btn-outline-success" asp-page-handler="ExportCsv" asp-route-actionFilter="@Model.ActionFilter" asp-route-startDate="@Model.StartDate" asp-route-endDate="@Model.EndDate">Export CSV</a>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm flex-fill">Filter</button>
+                <a class="btn btn-outline-secondary btn-sm flex-fill" asp-page="">Clear</a>
             </div>
         </form>
     </div>
 </div>
 
-<h4 class="mb-3">Events (@Model.ViewModel.Events.Count)</h4>
-@if (Model.ViewModel.Events.Any())
-{
-    <div class="table-responsive">
-        <table class="table table-sm table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>Timestamp</th>
-                    <th>User</th>
-                    <th>Action</th>
-                    <th>Details</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var evt in Model.ViewModel.Events)
-                {
-                    <tr>
-                        <td class="small">@evt.Timestamp.ToLocalTime().ToString("g")</td>
-                        <td class="small">@evt.Who</td>
-                        <td><span class="badge bg-secondary">@evt.Action</span></td>
-                        <td class="small">@evt.Details</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <span>Events</span>
+        <span style="font-size:.72rem;font-weight:700;letter-spacing:.06em;background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border-light);padding:.2rem .55rem;border-radius:2rem">@eventCount</span>
     </div>
-}
-else
-{
-    <p class="text-muted">No events match the filters.</p>
-}
+    @if (Model.ViewModel.Events.Any())
+    {
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var evt in Model.ViewModel.Events)
+                        {
+                            <tr>
+                                <td style="white-space:nowrap;font-size:.82rem;color:var(--text-muted)">@evt.Timestamp.ToLocalTime().ToString("d MMM, HH:mm")</td>
+                                <td style="font-size:.875rem">@evt.Who</td>
+                                <td>
+                                    <span class="badge" style="background:rgba(200,164,90,.12);color:#c8a45a;border:1px solid rgba(200,164,90,.2);font-size:.65rem;letter-spacing:.05em">@evt.Action</span>
+                                </td>
+                                <td style="font-size:.82rem;color:var(--text-muted)">@evt.Details</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card-body p-4 text-center">
+            <p style="color:var(--text-muted);margin:0;font-size:.875rem">No events match the current filters.</p>
+        </div>
+    }
+</div>

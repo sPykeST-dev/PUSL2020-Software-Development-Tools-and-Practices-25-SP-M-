@@ -29,4 +29,30 @@ public class ProposalRepository : Repository<Proposal>, IProposalRepository
     {
         return await _context.Proposals.AnyAsync(p => p.StudentId == studentId);
     }
+
+    public async Task<List<Proposal>> GetAllSubmittedAsync()
+    {
+        return await _context.Proposals
+            .Include(p => p.ResearchArea)
+            .Where(p => p.SubmittedAt.HasValue)
+            .OrderByDescending(p => p.SubmittedAt)
+            .ToListAsync();
+    }
+
+    public async Task<Proposal?> GetByIdWithDetailsAsync(int id)
+    {
+        return await _context.Proposals
+            .Include(p => p.ResearchArea)
+            .Include(p => p.Student)
+            .FirstOrDefaultAsync(p => p.Id == id);
+    }
+
+    public async Task<List<Proposal>> GetAllWithDetailsAsync()
+    {
+        return await _context.Proposals
+            .Include(p => p.ResearchArea)
+            .Include(p => p.Student)
+            .OrderByDescending(p => p.SubmittedAt)
+            .ToListAsync();
+    }
 }

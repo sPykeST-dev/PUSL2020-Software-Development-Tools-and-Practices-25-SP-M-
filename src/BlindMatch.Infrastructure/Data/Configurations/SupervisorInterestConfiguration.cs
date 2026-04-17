@@ -37,6 +37,6 @@ public class SupervisorInterestConfiguration : IEntityTypeConfiguration<Supervis
         builder.HasOne(si => si.Proposal)
             .WithMany(p => p.Interests)
             .HasForeignKey(si => si.ProposalId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

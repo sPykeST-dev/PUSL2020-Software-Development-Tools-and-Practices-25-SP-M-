@@ -30,7 +30,10 @@ public class ResearchAreasModel : PageModel
     public async Task<IActionResult> OnPostCreateAsync()
     {
         if (!ModelState.IsValid)
-            return await OnGetAsync() ?? Page();
+        {
+            await OnGetAsync();
+            return Page();
+        }
 
         NewArea.Name = NewArea.Name?.Trim() ?? string.Empty;
         NewArea.IsActive = true;

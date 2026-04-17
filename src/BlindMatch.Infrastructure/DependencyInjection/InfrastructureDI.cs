@@ -1,4 +1,5 @@
 using BlindMatch.Core.Entities;
+using BlindMatch.Core.Interfaces;
 using BlindMatch.Core.Interfaces.Repositories;
 using BlindMatch.Core.Interfaces.Services;
 using BlindMatch.Infrastructure.Data;
@@ -18,6 +19,19 @@ public static class InfrastructureDI
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
 
+        services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+        {
+            options.Password.RequireUppercase       = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequireDigit           = true;
+            options.Password.RequiredLength         = 8;
+            options.Lockout.DefaultLockoutTimeSpan  = TimeSpan.FromMinutes(15);
+            options.Lockout.MaxFailedAccessAttempts = 5;
+        })
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders()
+        .AddClaimsPrincipalFactory<AppClaimsFactory>();
+
         // Repositories
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<ISupervisorRepository, SupervisorRepository>();
@@ -26,16 +40,19 @@ public static class InfrastructureDI
         services.AddScoped<IProposalRepository, ProposalRepository>();
         services.AddScoped<IMatchRepository, MatchRepository>();
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
-        // Other repositories will be added by other members
+        services.AddScoped<IAuditRepository, AuditRepository>();
 
         // Services
+        services.AddScoped<IUserService, UserService>();
         services.AddScoped<SupervisorService>();
         services.AddScoped<IProposalService, ProposalService>();
         services.AddScoped<IBlindMatchService, BlindMatchService>();
         services.AddScoped<IIdentityRevealService, IdentityRevealService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IAuditService, AuditService>();
-        // Other services will be added by other members
+        services.AddScoped<IMatchApprovalService, ModuleLeaderService>();
+        services.AddScoped<ModuleLeaderService>();
+        services.AddScoped<ActiveUserFilter>();
 
         return services;
     }

@@ -1,55 +1,83 @@
 @model SupervisorProfileViewModel
-
 @{
-    ViewData["Title"] = "Supervisor Profile";
+    ViewData["Title"] = "My Profile";
+    var capacity = Model.Supervisor.MaxProjects > 0
+        ? (int)Math.Round((double)Model.Supervisor.CurrentProjects / Model.Supervisor.MaxProjects * 100)
+        : 0;
 }
 
-<h1>My Profile</h1>
+<div class="page-header">
+    <h1>My Profile</h1>
+    <p>Supervisor account details and research preferences</p>
+</div>
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Personal Information</h5>
-                <p><strong>Name:</strong> @Model.Supervisor.FullName</p>
-                <p><strong>Email:</strong> @Model.Supervisor.Email</p>
-                <p><strong>Department:</strong> @Model.Supervisor.Department</p>
-                <p><strong>Max Projects:</strong> @Model.Supervisor.MaxProjects</p>
-                <p><strong>Current Projects:</strong> @Model.Supervisor.CurrentProjects</p>
+
+<div class="row g-4">
+
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="card-header">Personal Information</div>
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="profile-avatar">
+                        @Model.Supervisor.FirstName[0]@Model.Supervisor.LastName[0]
+                    </div>
+                    <div>
+                        <div class="fw-semibold" style="font-size:1.05rem;color:var(--text)">@Model.Supervisor.FullName</div>
+                        <div class="small" style="color:var(--text-muted)">@Model.Supervisor.Email</div>
+                    </div>
+                </div>
+
+                <dl class="row mb-0 small profile-dl">
+                    <dt class="col-5">Department</dt>
+                    <dd class="col-7">@Model.Supervisor.Department</dd>
+
+                    <dt class="col-5">Capacity</dt>
+                    <dd class="col-7">
+                        <div class="d-flex align-items-center gap-2">
+                            <span>@Model.Supervisor.CurrentProjects / @Model.Supervisor.MaxProjects</span>
+                            <div class="capacity-bar flex-grow-1">
+                                <div class="capacity-fill" style="width:@capacity%"></div>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+            <div class="card-footer px-4 py-3 d-flex gap-2">
+                <a asp-controller="SupervisorBrowse" asp-action="Index" class="btn btn-primary btn-sm">Browse Projects</a>
+                <a asp-controller="Interest" asp-action="MyInterests" class="btn btn-outline-secondary btn-sm">My Interests</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Research Areas</h5>
-                <p>Select the research areas you specialize in. This will help filter proposals on the browse page.</p>
+    <div class="col-lg-7">
+        <div class="card h-100">
+            <div class="card-header">Research Areas</div>
+            <div class="card-body p-4">
+                <p class="small mb-4" style="color:var(--text-muted)">
+                    Select the areas you specialise in. These filter the proposals shown to you on the Browse page.
+                </p>
 
-                <form method="post" action="@Url.Action("UpdateResearchAreas")">
+                <form method="post" asp-action="UpdateResearchAreas">
                     @Html.AntiForgeryToken()
-
-                    @foreach (var area in Model.AvailableResearchAreas)
-                    {
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox"
-                                   name="researchAreaIds" value="@area.Id"
-                                   id="area_@area.Id"
-                                   @(Model.SelectedResearchAreaIds.Contains(area.Id) ? "checked" : "")>
-                            <label class="form-check-label" for="area_@area.Id">
+                    <div class="research-area-grid mb-4">
+                        @foreach (var area in Model.AvailableResearchAreas)
+                        {
+                            var isChecked = Model.SelectedResearchAreaIds.Contains(area.Id);
+                            <label class="area-chip @(isChecked ? "area-chip--selected" : "")">
+                                <input type="checkbox" name="researchAreaIds" value="@area.Id"
+                                       @(isChecked ? "checked" : "") class="visually-hidden"
+                                       onchange="this.closest('label').classList.toggle('area-chip--selected', this.checked)">
                                 @area.Name
                             </label>
-                        </div>
-                    }
-
-                    <button type="submit" class="btn btn-primary mt-3">Update Research Areas</button>
+                        }
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary btn-sm">Save Preferences</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
-</div>
 
-<div class="mt-4">
-    <a href="@Url.Action("Index", "SupervisorBrowse")" class="btn btn-primary">Browse Proposals</a>
-    <a href="@Url.Action("MyInterests", "Interest")" class="btn btn-secondary">My Interests</a>
 </div>

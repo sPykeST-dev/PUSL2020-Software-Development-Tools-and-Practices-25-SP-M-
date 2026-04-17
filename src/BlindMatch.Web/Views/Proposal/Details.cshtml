@@ -1,67 +1,137 @@
 @model BlindMatch.Web.ViewModels.Proposal.ProposalDetailsViewModel
+@using BlindMatch.Core.Enums
 
 @{
-	ViewData["Title"] = "Proposal Details";
+    ViewData["Title"] = "My Proposal";
+
+    var statusColor = Model.Status switch {
+        ProposalStatus.Submitted => "bg-primary",
+        ProposalStatus.Matched   => "bg-success",
+        ProposalStatus.Rejected  => "bg-danger",
+        ProposalStatus.Withdrawn => "bg-secondary",
+        _                        => "bg-light text-dark"
+    };
 }
 
-<h2>Proposal Details</h2>
+<div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div>
+        <h1>My Proposal</h1>
+        <p>Your submitted project proposal</p>
+    </div>
+    <span class="badge @statusColor fs-6 px-3 py-2">@Model.Status</span>
+</div>
 
 @if (TempData["SuccessMessage"] is string successMessage)
 {
-	<div class="alert alert-success">@successMessage</div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
 
 @if (TempData["ErrorMessage"] is string errorMessage)
 {
-	<div class="alert alert-danger">@errorMessage</div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @errorMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
 
-<dl class="row">
-	<dt class="col-sm-3">Title</dt>
-	<dd class="col-sm-9">@Model.Title</dd>
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">Project Details</div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <div class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Title</div>
+                    <div class="fw-semibold mt-1" style="font-size:1.1rem">@Model.Title</div>
+                </div>
+                <div class="mb-4">
+                    <div class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Abstract</div>
+                    <p class="mt-1 mb-0" style="line-height:1.7">@Model.Abstract</p>
+                </div>
+                <div class="mb-4">
+                    <div class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Technical Stack</div>
+                    <p class="mt-1 mb-0">@Model.TechnicalStack</p>
+                </div>
+                <div class="mb-0">
+                    <div class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Keywords</div>
+                    <div class="mt-1 d-flex flex-wrap gap-1">
+                        @foreach (var kw in (Model.Keywords ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                        {
+                            <span class="badge bg-light text-dark border">@kw</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-	<dt class="col-sm-3">Abstract</dt>
-	<dd class="col-sm-9">@Model.Abstract</dd>
+    <div class="col-lg-4 d-flex flex-column gap-4">
+        <div class="card">
+            <div class="card-header">Classification</div>
+            <div class="card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-5 text-muted fw-normal">Research Area</dt>
+                    <dd class="col-7 fw-semibold">@Model.ResearchAreaName</dd>
 
-	<dt class="col-sm-3">Technical Stack</dt>
-	<dd class="col-sm-9">@Model.TechnicalStack</dd>
+                    <dt class="col-5 text-muted fw-normal">Submitted</dt>
+                    <dd class="col-7">@(Model.SubmittedAt?.ToString("d MMM yyyy") ?? "—")</dd>
 
-	<dt class="col-sm-3">Keywords</dt>
-	<dd class="col-sm-9">@Model.Keywords</dd>
+                    <dt class="col-5 text-muted fw-normal">Last Updated</dt>
+                    <dd class="col-7 mb-0">@Model.UpdatedAt.ToString("d MMM yyyy")</dd>
 
-	<dt class="col-sm-3">Research Area</dt>
-	<dd class="col-sm-9">@Model.ResearchAreaName</dd>
+                    @if (Model.WithdrawnAt.HasValue)
+                    {
+                        <dt class="col-5 text-muted fw-normal">Withdrawn</dt>
+                        <dd class="col-7 mb-0">@Model.WithdrawnAt.Value.ToString("d MMM yyyy")</dd>
+                    }
+                </dl>
+            </div>
+        </div>
 
-	<dt class="col-sm-3">Status</dt>
-	<dd class="col-sm-9">@Model.Status</dd>
-
-	<dt class="col-sm-3">Submitted At</dt>
-	<dd class="col-sm-9">@(Model.SubmittedAt?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")</dd>
-
-	<dt class="col-sm-3">Last Updated</dt>
-	<dd class="col-sm-9">@Model.UpdatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
-
-	@if (Model.WithdrawnAt.HasValue)
-	{
-		<dt class="col-sm-3">Withdrawn At</dt>
-		<dd class="col-sm-9">@Model.WithdrawnAt.Value.ToString("yyyy-MM-dd HH:mm")</dd>
-	}
-</dl>
-
-<div class="mt-3 d-flex gap-2">
-	@if (Model.CanEdit)
-	{
-		<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
-	}
-
-	@if (Model.CanWithdraw)
-	{
-		<a asp-action="Withdraw" asp-route-id="@Model.Id" class="btn btn-danger">Withdraw</a>
-	}
-
-	<a asp-action="Create" class="btn btn-outline-secondary">New Submission</a>
+        <div class="card">
+            <div class="card-body p-3">
+                @if (Model.Status == ProposalStatus.Matched)
+                {
+                    <p class="text-muted small mb-3">
+                        A supervisor has been matched to your proposal. Visit <strong>My Match</strong> to see their details.
+                    </p>
+                    <div class="d-grid">
+                        <a asp-controller="Match" asp-action="MyMatch" class="btn btn-success btn-sm">View My Match</a>
+                    </div>
+                }
+                else if (Model.Status == ProposalStatus.Submitted)
+                {
+                    <p class="text-muted small mb-3">
+                        Supervisor identity is hidden until a match is confirmed. You will be notified once a supervisor confirms interest.
+                    </p>
+                    <div class="d-grid gap-2">
+                        @if (Model.CanEdit)
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">Edit Proposal</a>
+                        }
+                        @if (Model.CanWithdraw)
+                        {
+                            <a asp-action="Withdraw" asp-route-id="@Model.Id" class="btn btn-outline-danger btn-sm">Withdraw</a>
+                        }
+                    </div>
+                }
+                else if (Model.Status == ProposalStatus.Withdrawn)
+                {
+                    <p class="text-muted small mb-3">Your proposal has been withdrawn.</p>
+                    <div class="d-grid">
+                        <a asp-action="Create" class="btn btn-outline-primary btn-sm">Submit New Proposal</a>
+                    </div>
+                }
+                else if (Model.Status == ProposalStatus.Rejected)
+                {
+                    <p class="text-muted small mb-3">Your proposal was not matched this cycle. You may submit a new one.</p>
+                    <div class="d-grid">
+                        <a asp-action="Create" class="btn btn-outline-primary btn-sm">Submit New Proposal</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>
-
-<p class="text-muted mt-3 mb-0">
-	Supervisor identity is hidden until reveal stage.
-</p>

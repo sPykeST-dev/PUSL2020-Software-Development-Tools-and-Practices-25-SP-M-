@@ -149,9 +149,9 @@ public class AccountController : Controller
         if (User.IsInRole(Roles.Student))
             return RedirectToAction("Index", "Proposal");
         if (User.IsInRole(Roles.Supervisor))
-            return RedirectToAction("Browse", "Proposal");
+            return RedirectToAction("Index", "SupervisorBrowse");
         if (User.IsInRole(Roles.ModuleLeader))
-            return RedirectToAction("Index", "Dashboard");
+            return LocalRedirect("/module-leader/dashboard");
         if (User.IsInRole(Roles.SystemAdministrator))
             return RedirectToAction("Index", "UserManagement");
 

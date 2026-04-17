@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BlindMatch.Core.Enums;
 using BlindMatch.Core.Interfaces.Repositories;
 using BlindMatch.Infrastructure.Services;
@@ -28,7 +29,7 @@ public class ProposalOversightModel : PageModel
     public async Task OnGetAsync(ProposalStatus? filterStatus = null)
     {
         FilterStatus = filterStatus;
-        var allProposals = await _proposalRepository.GetAllAsync();
+        var allProposals = await _proposalRepository.GetAllWithDetailsAsync();
 
         var filtered = filterStatus.HasValue
             ? allProposals.Where(p => p.Status == filterStatus.Value)
@@ -40,11 +41,11 @@ public class ProposalOversightModel : PageModel
                 Id = p.Id,
                 ProjectCode = $"#{p.Id:D4}",
                 Title = p.Title,
-                StudentName = p.Student?.FullName ?? "—",
-                StudentEmail = p.Student?.Email ?? "—",
-                ResearchArea = p.ResearchArea?.Name ?? "—",
-                Status = p.Status ?? ProposalStatus.Draft,
-                CreatedAt = p.CreatedAt,
+                StudentName = p.Student?.FullName ?? "ï¿½",
+                StudentEmail = p.Student?.Email ?? "ï¿½",
+                ResearchArea = p.ResearchArea?.Name ?? "ï¿½",
+                Status = p.Status,
+                CreatedAt = p.SubmittedAt.GetValueOrDefault(),
                 SubmittedAt = p.SubmittedAt
             })
             .OrderByDescending(p => p.CreatedAt)
@@ -53,7 +54,7 @@ public class ProposalOversightModel : PageModel
 
     public async Task<IActionResult> OnPostChangeStatusAsync(int proposalId, ProposalStatus newStatus)
     {
-        var userId = User.FindFirst("UserId")?.Value;
+        var userId = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
         var fullName = User.Identity?.Name;
 
         var result = await _service.ChangeProposalStatusAsync(proposalId, newStatus, userId, fullName);

@@ -1,11 +1,12 @@
 using BlindMatch.Core.Entities;
 using BlindMatch.Core.Enums;
 using BlindMatch.Core.Interfaces.Repositories;
+using BlindMatch.Core.Interfaces.Services;
 using BlindMatch.Core.ValueObjects;
 
 namespace BlindMatch.Infrastructure.Services;
 
-public class ModuleLeaderService
+public class ModuleLeaderService : IMatchApprovalService
 {
     private readonly IMatchRepository _matchRepository;
     private readonly IProposalRepository _proposalRepository;
@@ -36,7 +37,7 @@ public class ModuleLeaderService
         if (match.Status != MatchStatus.Pending)
             return Result.Failure("Only pending matches can be approved.");
 
-        match.Status = MatchStatus.Active;
+        match.Status = MatchStatus.Approved;
         match.ApprovedAt = DateTime.UtcNow;
         await _matchRepository.UpdateAsync(match);
 

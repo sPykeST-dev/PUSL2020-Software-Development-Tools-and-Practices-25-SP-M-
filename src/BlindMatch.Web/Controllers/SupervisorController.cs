@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BlindMatch.Core.Entities;
 using BlindMatch.Core.Interfaces.Repositories;
 using BlindMatch.Infrastructure.Services;
@@ -25,17 +26,13 @@ public class SupervisorController : Controller
 
     public async Task<IActionResult> Profile()
     {
-        var supervisorId = User.FindFirst("UserId")?.Value;
+        var supervisorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(supervisorId))
-        {
             return Unauthorized();
-        }
 
         var supervisor = await _supervisorRepository.GetByIdWithResearchAreasAsync(supervisorId);
         if (supervisor == null)
-        {
             return NotFound();
-        }
 
         var researchAreas = await _researchAreaRepository.GetAllAsync();
         var viewModel = new SupervisorProfileViewModel
@@ -51,22 +48,14 @@ public class SupervisorController : Controller
     [HttpPost]
     public async Task<IActionResult> UpdateResearchAreas(List<int> researchAreaIds)
     {
-        var supervisorId = User.FindFirst("UserId")?.Value;
+        var supervisorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(supervisorId))
-        {
             return Unauthorized();
-        }
 
         var result = await _supervisorService.UpdateResearchAreasAsync(supervisorId, researchAreaIds);
 
-        if (result.IsSuccess)
-        {
-            TempData["Success"] = "Research areas updated successfully.";
-        }
-        else
-        {
-            TempData["Error"] = result.Error;
-        }
+        TempData[result.IsSuccess ? "Success" : "Error"] =
+            result.IsSuccess ? "Research areas updated successfully." : result.Error;
 
         return RedirectToAction("Profile");
     }

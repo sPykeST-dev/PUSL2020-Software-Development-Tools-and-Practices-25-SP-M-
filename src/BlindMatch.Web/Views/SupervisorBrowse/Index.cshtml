@@ -1,49 +1,83 @@
 @model BrowseViewModel
-
 @{
     ViewData["Title"] = "Browse Proposals";
+    var total = Model.Pagination.TotalItems;
 }
 
-<h1>Browse Proposals</h1>
+<div class="page-header d-flex align-items-end justify-content-between flex-wrap gap-2">
+    <div>
+        <h1>Browse Proposals</h1>
+        <p>@total proposal@(total == 1 ? "" : "s") available — student identities are hidden</p>
+    </div>
 
-<form method="get" class="mb-4">
-    <div class="row">
-        <div class="col-md-4">
-            <label for="researchAreaId" class="form-label">Filter by Research Area</label>
-            <select name="researchAreaId" id="researchAreaId" class="form-select" onchange="this.form.submit()">
-                <option value="">All Research Areas</option>
+    <div class="d-flex align-items-center gap-2 mb-1">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        @{
+            var selectedArea = Model.Filter.ResearchAreas.FirstOrDefault(a => a.Selected);
+            var selectedLabel = selectedArea?.Text ?? "All Research Areas";
+        }
+        <div class="dropdown">
+            <button class="btn filter-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                @selectedLabel
+            </button>
+            <ul class="dropdown-menu filter-dropdown-menu">
+                <li>
+                    <a class="dropdown-item @(Model.Filter.ResearchAreaId == null ? "active" : "")"
+                       href="@Url.Action("Index", new { page = 1 })">All Research Areas</a>
+                </li>
                 @foreach (var area in Model.Filter.ResearchAreas)
                 {
-                    <option value="@area.Value" selected="@area.Selected">@area.Text</option>
+                    <li>
+                        <a class="dropdown-item @(area.Selected ? "active" : "")"
+                           href="@Url.Action("Index", new { researchAreaId = area.Value, page = 1 })">@area.Text</a>
+                    </li>
                 }
-            </select>
+            </ul>
         </div>
     </div>
-</form>
+</div>
 
 @if (!Model.Proposals.Any())
 {
-    <div class="alert alert-info">
-        No proposals available at the moment.
+    <div class="card" style="max-width:480px">
+        <div class="card-body p-4 text-center">
+            <p class="text-muted mb-0">No proposals match the selected filter.</p>
+        </div>
     </div>
 }
 else
 {
-    <div class="row">
+    <div class="row g-4">
         @foreach (var proposal in Model.Proposals)
         {
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">@proposal.ProjectCode</h5>
-                        <p class="card-text">
-                            <strong>Research Area:</strong> @proposal.ResearchArea<br>
-                            <strong>Keywords:</strong> @proposal.Keywords<br>
-                            <strong>Submitted:</strong> @proposal.SubmittedAt.ToString("d")
-                        </p>
+            <div class="col-md-6">
+                <div class="card browse-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="browse-code">@proposal.ProjectCode</span>
+                            <span class="badge browse-area-badge">@proposal.ResearchArea</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="browse-label">Keywords</div>
+                            <div class="d-flex flex-wrap gap-1 mt-1">
+                                @foreach (var kw in (proposal.Keywords ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                                {
+                                    <span class="badge browse-kw-badge">@kw</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="browse-label">Submitted</div>
+                        <div class="browse-meta mt-1">@proposal.SubmittedAt.ToString("d MMM yyyy")</div>
                     </div>
-                    <div class="card-footer">
-                        <a href="@Url.Action("Details", new { id = proposal.Id })" class="btn btn-primary">View Details</a>
+                    <div class="card-footer px-4 py-3 d-flex justify-content-end">
+                        <a href="@Url.Action("Details", new { id = proposal.Id })" class="btn btn-primary btn-sm">
+                            View Details
+                        </a>
                     </div>
                 </div>
             </div>
@@ -52,26 +86,24 @@ else
 
     @if (Model.Pagination.TotalPages > 1)
     {
-        <nav aria-label="Proposal pagination">
+        <nav class="mt-4" aria-label="Proposal pagination">
             <ul class="pagination justify-content-center">
                 @if (Model.Pagination.CurrentPage > 1)
                 {
                     <li class="page-item">
-                        <a class="page-link" href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage - 1, researchAreaId = Model.Filter.ResearchAreaId })">Previous</a>
+                        <a class="page-link" href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage - 1, researchAreaId = Model.Filter.ResearchAreaId })">←</a>
                     </li>
                 }
-
                 @for (int i = Math.Max(1, Model.Pagination.CurrentPage - 2); i <= Math.Min(Model.Pagination.TotalPages, Model.Pagination.CurrentPage + 2); i++)
                 {
                     <li class="page-item @(i == Model.Pagination.CurrentPage ? "active" : "")">
                         <a class="page-link" href="@Url.Action("Index", new { page = i, researchAreaId = Model.Filter.ResearchAreaId })">@i</a>
                     </li>
                 }
-
                 @if (Model.Pagination.CurrentPage < Model.Pagination.TotalPages)
                 {
                     <li class="page-item">
-                        <a class="page-link" href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage + 1, researchAreaId = Model.Filter.ResearchAreaId })">Next</a>
+                        <a class="page-link" href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage + 1, researchAreaId = Model.Filter.ResearchAreaId })">→</a>
                     </li>
                 }
             </ul>

@@ -55,7 +55,8 @@ public class UserManagementController : Controller
         }
 
         var (result, _) = await _userService.CreateUserAsync(
-            model.FirstName, model.LastName, model.Email, model.Password, model.Role);
+            model.FirstName, model.LastName, model.Email, model.Password, model.Role,
+            department: model.Department);
 
         if (result.Succeeded)
         {

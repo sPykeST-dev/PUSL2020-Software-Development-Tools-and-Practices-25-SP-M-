@@ -1,0 +1,10 @@
+services:
+  web:
+    environment:
+      SEED_DEMO_DATA: "true"
+  db:
+    volumes:
+      - sqldata-demo:/var/opt/mssql
+
+volumes:
+  sqldata-demo:

@@ -10,56 +10,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] — BlindMatch</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        body {
+            background-color: #0c0a07 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-height: 100vh !important;
+            margin: 0;
+            padding: 1rem;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.08;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 250px 250px;
+        }
+        body > div {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
 </head>
-<body class="bg-light d-flex align-items-center min-vh-100">
+<body>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow-sm">
-                <div class="card-body p-4">
+<div style="width:100%;max-width:400px">
 
-                    <h1 class="h4 mb-4">Sign in to BlindMatch</h1>
+    <div class="text-center mb-4">
+        <a href="/" style="font-weight:800;font-size:1.75rem;letter-spacing:.18em;text-transform:uppercase;color:#c8a45a;text-decoration:none;">BlindMatch</a>
+    </div>
 
-                    <form asp-action="Login" asp-controller="Account" method="post">
-                        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+    <div class="card">
+        <div class="card-body p-4">
 
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+            <h1 class="h5 fw-bold mb-4" style="color:#ede8df;letter-spacing:.06em;text-transform:uppercase;font-size:.9rem!important">Sign in to your account</h1>
 
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" autocomplete="email" />
-                            <span asp-validation-for="Email" class="text-danger small"></span>
-                        </div>
+            <form asp-action="Login" asp-controller="Account" method="post">
+                <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
 
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label"></label>
-                            <input asp-for="Password" class="form-control" autocomplete="current-password" />
-                            <span asp-validation-for="Password" class="text-danger small"></span>
-                        </div>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
 
-                        <div class="mb-3 form-check">
-                            <input asp-for="RememberMe" class="form-check-input" />
-                            <label asp-for="RememberMe" class="form-check-label"></label>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100">Sign in</button>
-                    </form>
-
-                    <hr />
-
-                    <p class="mb-1 small">
-                        <a asp-action="ForgotPassword" asp-controller="Account">Forgot your password?</a>
-                    </p>
-                    <p class="mb-0 small">
-                        New student?
-                        <a asp-action="Register" asp-controller="Account">Create an account</a>
-                    </p>
-
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" autocomplete="email" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
                 </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4 d-flex align-items-center gap-2">
+                    <input asp-for="RememberMe" class="form-check-input login-check mt-0 flex-shrink-0" />
+                    <label asp-for="RememberMe" class="login-check-label mb-0">Remember me</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Sign in</button>
+            </form>
+
+            <div class="login-footer-links mt-3">
+                <a asp-action="ForgotPassword" asp-controller="Account" class="login-footer-link">Forgot your password?</a>
+                <span class="login-footer-text">New student? <a asp-action="Register" asp-controller="Account" class="login-footer-link">Create an account</a></span>
             </div>
+
         </div>
     </div>
+
+    <div class="text-center mt-3">
+        <a href="/" class="login-back-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:.35rem;vertical-align:middle">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>Back to home
+        </a>
+    </div>
+
 </div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
