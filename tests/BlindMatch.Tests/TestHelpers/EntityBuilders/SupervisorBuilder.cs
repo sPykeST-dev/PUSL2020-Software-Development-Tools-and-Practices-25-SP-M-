@@ -45,6 +45,15 @@ public class SupervisorBuilder
         return this;
     }
 
+    public SupervisorBuilder WithEmail(string email)
+    {
+        _supervisor.Email             = email;
+        _supervisor.UserName          = email;
+        _supervisor.NormalizedEmail   = email.ToUpperInvariant();
+        _supervisor.NormalizedUserName = email.ToUpperInvariant();
+        return this;
+    }
+
     public SupervisorBuilder WithDepartment(string dept)
     {
         _supervisor.Department = dept;
