@@ -1,6 +1,7 @@
 using BlindMatch.Core.Entities;
 using BlindMatch.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Match = BlindMatch.Core.Entities.Match;
 
 namespace BlindMatch.Tests.IntegrationTests.Infrastructure;
@@ -16,6 +17,7 @@ public class TestDatabaseFixture : IDisposable
     {
         var opts = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(dbName ?? Guid.NewGuid().ToString())
+            .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
             .Options;
 
         var ctx = new ApplicationDbContext(opts);
