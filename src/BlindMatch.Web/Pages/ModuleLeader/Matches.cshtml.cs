@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using BlindMatch.Core.Common;
+using BlindMatch.Core.Entities;
 using BlindMatch.Core.Enums;
 using BlindMatch.Core.Interfaces.Repositories;
 using BlindMatch.Infrastructure.Services;
@@ -38,12 +40,12 @@ public class MatchesModel : PageModel
                 Id = m.Id,
                 ProposalId = m.ProposalId,
                 ProjectCode = $"#{m.ProposalId:D4}",
-                ProposalTitle = m.Proposal?.Title ?? "—",
-                StudentName = m.Student?.FullName ?? "—",
-                StudentEmail = m.Student?.Email ?? "—",
-                SupervisorName = m.Supervisor?.FullName ?? "—",
-                SupervisorEmail = m.Supervisor?.Email ?? "—",
-                SupervisorDepartment = m.Supervisor?.Department ?? "—",
+                ProposalTitle = m.Proposal?.Title ?? "ï¿½",
+                StudentName = m.Student?.FullName ?? "ï¿½",
+                StudentEmail = m.Student?.Email ?? "ï¿½",
+                SupervisorName = m.Supervisor?.FullName ?? "ï¿½",
+                SupervisorEmail = m.Supervisor?.Email ?? "ï¿½",
+                SupervisorDepartment = m.Supervisor?.Department ?? "ï¿½",
                 CreatedAt = m.CreatedAt
             })
             .ToList();
@@ -53,7 +55,7 @@ public class MatchesModel : PageModel
 
     public async Task<IActionResult> OnPostApproveAsync(int matchId)
     {
-        var userId = User.FindFirst("UserId")?.Value;
+        var userId = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
         var fullName = User.Identity?.Name;
 
         var result = await _service.ApproveMatchAsync(matchId, userId, fullName);
@@ -77,7 +79,7 @@ public class MatchesModel : PageModel
             return RedirectToPage();
         }
 
-        var userId = User.FindFirst("UserId")?.Value;
+        var userId = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
         var fullName = User.Identity?.Name;
 
         var result = await _service.RejectMatchAsync(matchId, rejectReason, userId, fullName);
@@ -101,7 +103,7 @@ public class MatchesModel : PageModel
             return RedirectToPage();
         }
 
-        var userId = User.FindFirst("UserId")?.Value;
+        var userId = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
         var fullName = User.Identity?.Name;
 
         var result = await _service.ReassignMatchAsync(matchId, newSupervisorId, userId, fullName);

@@ -2,74 +2,138 @@
 @model BlindMatch.Web.Pages.ModuleLeader.MatchesModel
 @{
     ViewData["Title"] = "Pending Matches";
+    var count = Model.PendingMatches.Count;
 }
 
-<h1 class="mb-4">Pending Matches</h1>
+<div class="page-header d-flex align-items-end justify-content-between flex-wrap gap-2">
+    <div>
+        <h1>Pending Matches</h1>
+        <p>@count match@(count == 1 ? "" : "es") awaiting review</p>
+    </div>
+    <a href="/module-leader/dashboard" class="btn btn-outline-secondary btn-sm mb-1">Back to Dashboard</a>
+</div>
 
 @if (!Model.PendingMatches.Any())
 {
-    <div class="alert alert-info">No pending matches to review.</div>
+    <div class="card" style="max-width:480px">
+        <div class="card-body p-4 text-center">
+            <p style="color:var(--text-muted);margin:0;font-size:.875rem">No pending matches to review.</p>
+        </div>
+    </div>
 }
 else
 {
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>Project</th>
-                    <th>Title</th>
-                    <th>Student</th>
-                    <th>Supervisor</th>
-                    <th>Created</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var match in Model.PendingMatches)
-                {
-                    <tr>
-                        <td class="small">@match.ProjectCode</td>
-                        <td>@match.ProposalTitle</td>
-                        <td>
-                            <small>@match.StudentName<br />@match.StudentEmail</small>
-                        </td>
-                        <td>
-                            <small>@match.SupervisorName<br />@match.SupervisorEmail<br />@match.SupervisorDepartment</small>
-                        </td>
-                        <td class="small">@match.CreatedAt.ToLocalTime().ToString("g")</td>
-                        <td>
-                            <form method="post" asp-page-handler="Approve" class="d-inline">
-                                <input type="hidden" name="matchId" value="@match.Id" />
-                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
-                            </form>
+    <div class="d-flex flex-column gap-3">
+        @foreach (var match in Model.PendingMatches)
+        {
+            <div class="card">
+                <div class="card-body p-4">
+                    <div class="row g-3">
 
-                            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#reject-@match.Id">Reject</button>
+                        @* Project + Title *@
+                        <div class="col-lg-4">
+                            <div style="font-size:.67rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.25rem">@match.ProjectCode</div>
+                            <div style="font-size:.9rem;font-weight:600;color:var(--text);line-height:1.4">@match.ProposalTitle</div>
+                            <div style="font-size:.75rem;color:var(--text-muted);margin-top:.35rem">@match.CreatedAt.ToLocalTime().ToString("d MMM yyyy, HH:mm")</div>
+                        </div>
 
-                            <div id="reject-@match.Id" class="collapse mt-2 p-2 bg-light rounded">
-                                <form method="post" asp-page-handler="Reject">
-                                    <input type="hidden" name="matchId" value="@match.Id" />
-                                    <input type="text" name="rejectReason" class="form-control form-control-sm mb-2" placeholder="Reason (required)" required />
-                                    <button type="submit" class="btn btn-sm btn-danger">Confirm Reject</button>
-                                </form>
+                        @* Student *@
+                        <div class="col-sm-6 col-lg-4">
+                            <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:.4rem">Student</div>
+                            <div style="font-size:.875rem;font-weight:600;color:var(--text)">@match.StudentName</div>
+                            <div style="font-size:.8rem;color:var(--text-muted)">@match.StudentEmail</div>
+                        </div>
+
+                        @* Supervisor *@
+                        <div class="col-sm-6 col-lg-4">
+                            <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:.4rem">Supervisor</div>
+                            <div style="font-size:.875rem;font-weight:600;color:var(--text)">@match.SupervisorName</div>
+                            <div style="font-size:.8rem;color:var(--text-muted)">@match.SupervisorEmail</div>
+                            <div style="font-size:.78rem;color:var(--text-muted)">@match.SupervisorDepartment</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="card-footer px-4 py-3">
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+
+                        <form method="post" asp-page-handler="Approve" class="d-inline">
+                            <input type="hidden" name="matchId" value="@match.Id" />
+                            <button type="submit" class="btn btn-sm" style="background:rgba(74,124,89,.2);color:#6aaa7a;border:1px solid rgba(74,124,89,.35)">Approve</button>
+                        </form>
+
+                        <button type="button" class="btn btn-sm"
+                                style="background:rgba(122,48,48,.2);color:#e07878;border:1px solid rgba(122,48,48,.35)"
+                                data-bs-toggle="collapse" data-bs-target="#reject-@match.Id">
+                            Reject
+                        </button>
+
+                        <form method="post" asp-page-handler="Reassign" class="d-flex gap-2 align-items-center ms-auto">
+                            <input type="hidden" name="matchId" value="@match.Id" />
+                            <input type="hidden" name="newSupervisorId" id="reassign-input-@match.Id" />
+                            <div class="dropdown">
+                                <button type="button" id="reassign-btn-@match.Id"
+                                        class="form-control form-control-sm d-flex align-items-center justify-content-between gap-2"
+                                        style="min-width:220px;cursor:pointer"
+                                        data-bs-toggle="dropdown"
+                                        data-bs-display="static"
+                                        aria-expanded="false">
+                                    <span id="reassign-label-@match.Id" style="color:var(--text-subtle)">Reassign to…</span>
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:.5"><polyline points="6 9 12 15 18 9"/></svg>
+                                </button>
+                                <ul class="dropdown-menu" style="background:var(--surface-2);border-color:var(--border-light);padding:.35rem;min-width:100%">
+                                    @foreach (var sup in Model.AllSupervisors)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item reassign-option"
+                                               href="#"
+                                               data-match="@match.Id"
+                                               data-value="@sup.Id"
+                                               style="font-size:.82rem;border-radius:.35rem;color:var(--text-muted);padding:.45rem .75rem">
+                                                @sup.FullName <span style="color:var(--text-subtle)">(@sup.Department)</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
                             </div>
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">Reassign</button>
+                        </form>
 
-                            <div class="mt-2">
-                                <form method="post" asp-page-handler="Reassign" class="input-group input-group-sm">
-                                    <input type="hidden" name="matchId" value="@match.Id" />
-                                    <select name="newSupervisorId" class="form-select" required>
-                                        <option value="">Reassign to...</option>
-                                        @foreach (var sup in Model.AllSupervisors)
-                                        {
-                                            <option value="@sup.Id">@sup.FullName (@sup.Department)</option>
-                                        }
-                                    </select>
-                                    <button type="submit" class="btn btn-secondary">Reassign</button>
-                                </form>
+                    </div>
+
+                    <div id="reject-@match.Id" class="collapse mt-3">
+                        <form method="post" asp-page-handler="Reject">
+                            <input type="hidden" name="matchId" value="@match.Id" />
+                            <div class="d-flex gap-2">
+                                <input type="text" name="rejectReason" class="form-control form-control-sm"
+                                       placeholder="Reason for rejection (required)" required />
+                                <button type="submit" class="btn btn-sm flex-shrink-0"
+                                        style="background:rgba(122,48,48,.25);color:#e07878;border:1px solid rgba(122,48,48,.4)">
+                                    Confirm Reject
+                                </button>
                             </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 }
+
+<script>
+    document.querySelectorAll('.reassign-option').forEach(function(item) {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            var matchId = this.dataset.match;
+            document.getElementById('reassign-input-' + matchId).value = this.dataset.value;
+            var label = document.getElementById('reassign-label-' + matchId);
+            label.textContent = this.textContent.trim();
+            label.style.color = 'var(--text)';
+            this.closest('ul').querySelectorAll('.reassign-option').forEach(function(o) {
+                o.style.color = 'var(--text-muted)';
+            });
+            this.style.color = 'var(--accent)';
+        });
+    });
+</script>

@@ -1,12 +1,12 @@
+using System.Security.Claims;
+using BlindMatch.Core.Common;
 using BlindMatch.Core.Entities;
 using BlindMatch.Core.Interfaces.Repositories;
-using BlindMatch.Core.ValueObjects;
-using BlindMatch.Core.Common;
+using BlindMatch.Core.Interfaces.Services;
 using BlindMatch.Infrastructure.Services;
 using BlindMatch.Web.ViewModels.Interest;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BlindMatch.Web.Controllers;
 
@@ -30,7 +30,7 @@ public class InterestController : Controller
 
     public async Task<IActionResult> MyInterests()
     {
-        var supervisorId = User.FindFirst("UserId")?.Value;
+        var supervisorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(supervisorId))
         {
             return Unauthorized();
@@ -45,7 +45,7 @@ public class InterestController : Controller
     [HttpPost]
     public async Task<IActionResult> ExpressInterest(int proposalId)
     {
-        var supervisorId = User.FindFirst("UserId")?.Value;
+        var supervisorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(supervisorId))
         {
             return Unauthorized();
@@ -67,13 +67,13 @@ public class InterestController : Controller
 
     public async Task<IActionResult> ConfirmInterest(int id)
     {
-        var supervisorId = User.FindFirst("UserId")?.Value;
+        var supervisorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(supervisorId))
         {
             return Unauthorized();
         }
 
-        var interest = await _interestRepository.GetByIdAsync(id);
+        var interest = await _interestRepository.GetByIdWithDetailsAsync(id);
         if (interest == null || interest.SupervisorId != supervisorId || interest.Status != Core.Enums.InterestStatus.Pending)
         {
             return NotFound();

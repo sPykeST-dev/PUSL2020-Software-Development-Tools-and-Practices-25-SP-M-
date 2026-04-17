@@ -30,11 +30,11 @@ public class DashboardModel : PageModel
         ViewModel.TotalProposals = proposals.Count;
 
         ViewModel.ProposalsByStatus = proposals
-            .GroupBy(p => p.Status?.ToString() ?? "Unknown")
+            .GroupBy(p => p.Status.ToString())
             .ToDictionary(g => g.Key, g => g.Count());
 
         ViewModel.PendingMatches = await _matchRepository.CountByStatusAsync(Core.Enums.MatchStatus.Pending);
-        ViewModel.ActiveMatches = await _matchRepository.CountByStatusAsync(Core.Enums.MatchStatus.Active);
+        ViewModel.ActiveMatches = await _matchRepository.CountByStatusAsync(Core.Enums.MatchStatus.Approved);
 
         var recentAudit = await _auditRepository.GetRecentAsync(20);
         ViewModel.RecentActivity = recentAudit

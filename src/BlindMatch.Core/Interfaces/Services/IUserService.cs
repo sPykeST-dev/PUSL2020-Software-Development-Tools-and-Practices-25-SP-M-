@@ -12,7 +12,8 @@ public interface IUserService
         string password,
         string role,
         string? programme = null,
-        int? yearOfStudy = null);
+        int? yearOfStudy = null,
+        string? department = null);
     Task<IdentityResult> AssignRoleAsync(ApplicationUser user, string role);
     Task<IdentityResult> ChangeRoleAsync(string userId, string newRole);
     Task<IdentityResult> DeactivateUserAsync(string userId);

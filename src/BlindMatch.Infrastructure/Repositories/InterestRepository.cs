@@ -12,6 +12,15 @@ public class InterestRepository : Repository<SupervisorInterest>, IInterestRepos
     {
     }
 
+    public async Task<SupervisorInterest?> GetByIdWithDetailsAsync(int id)
+    {
+        return await _context.SupervisorInterests
+            .Include(si => si.Proposal)
+                .ThenInclude(p => p.ResearchArea)
+            .Include(si => si.Supervisor)
+            .FirstOrDefaultAsync(si => si.Id == id);
+    }
+
     public async Task<SupervisorInterest?> GetBySupervisorAndProposalAsync(string supervisorId, int proposalId)
     {
         return await _context.SupervisorInterests

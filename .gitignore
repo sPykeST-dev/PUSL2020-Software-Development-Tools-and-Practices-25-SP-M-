@@ -50,3 +50,7 @@ Desktop.ini
 
 ## LibMan restore target (restored at build time)
 src/BlindMatch.Web/wwwroot/lib/
+
+## Local Claude Code context — not committed
+.claude/
+CLAUDE.md

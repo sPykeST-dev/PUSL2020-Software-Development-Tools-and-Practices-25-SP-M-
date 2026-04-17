@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BlindMatch.Core.Entities;
 using BlindMatch.Core.Interfaces.Repositories;
 using BlindMatch.Core.ValueObjects;
@@ -13,22 +14,27 @@ public class SupervisorBrowseController : Controller
 {
     private readonly IProposalRepository _proposalRepository;
     private readonly IRepository<ResearchArea> _researchAreaRepository;
+    private readonly IInterestRepository _interestRepository;
 
     public SupervisorBrowseController(
         IProposalRepository proposalRepository,
-        IRepository<ResearchArea> researchAreaRepository)
+        IRepository<ResearchArea> researchAreaRepository,
+        IInterestRepository interestRepository)
     {
         _proposalRepository = proposalRepository;
         _researchAreaRepository = researchAreaRepository;
+        _interestRepository = interestRepository;
     }
 
     public async Task<IActionResult> Index(int? researchAreaId, int page = 1, int pageSize = 10)
     {
-        // For now, get all proposals - Member 3 will implement anonymised filtering
-        var allProposals = await _proposalRepository.GetAllAsync();
-        var proposals = allProposals
-            .Where(p => p.SubmittedAt.HasValue) // Only submitted proposals
-            .OrderByDescending(p => p.SubmittedAt)
+        var allSubmitted = await _proposalRepository.GetAllSubmittedAsync();
+
+        var filtered = researchAreaId.HasValue
+            ? allSubmitted.Where(p => p.ResearchAreaId == researchAreaId.Value).ToList()
+            : allSubmitted;
+
+        var proposals = filtered
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToList();
@@ -41,8 +47,8 @@ public class SupervisorBrowseController : Controller
             {
                 CurrentPage = page,
                 PageSize = pageSize,
-                TotalItems = allProposals.Count(p => p.SubmittedAt.HasValue),
-                TotalPages = (int)Math.Ceiling((double)allProposals.Count(p => p.SubmittedAt.HasValue) / pageSize)
+                TotalItems = filtered.Count,
+                TotalPages = (int)Math.Ceiling((double)filtered.Count / pageSize)
             }
         };
 
@@ -51,13 +57,14 @@ public class SupervisorBrowseController : Controller
 
     public async Task<IActionResult> Details(int id)
     {
-        var proposal = await _proposalRepository.GetByIdAsync(id);
+        var proposal = await _proposalRepository.GetByIdWithDetailsAsync(id);
         if (proposal == null || !proposal.SubmittedAt.HasValue)
-        {
             return NotFound();
-        }
 
-        var viewModel = MapToDetailViewModel(proposal);
+        var supervisorId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var alreadyExpressed = await _interestRepository.ExistsAsync(supervisorId, id);
+
+        var viewModel = MapToDetailViewModel(proposal, !alreadyExpressed);
         return View(viewModel);
     }
 
@@ -73,7 +80,7 @@ public class SupervisorBrowseController : Controller
         };
     }
 
-    private AnonymisedProposalDetailViewModel MapToDetailViewModel(Proposal proposal)
+    private AnonymisedProposalDetailViewModel MapToDetailViewModel(Proposal proposal, bool canExpressInterest)
     {
         return new AnonymisedProposalDetailViewModel
         {
@@ -85,7 +92,7 @@ public class SupervisorBrowseController : Controller
             Keywords = proposal.Keywords,
             ResearchArea = proposal.ResearchArea?.Name ?? "Unknown",
             SubmittedAt = proposal.SubmittedAt ?? proposal.UpdatedAt,
-            CanExpressInterest = true // Simplified - Member 5 will implement proper logic
+            CanExpressInterest = canExpressInterest
         };
     }
 

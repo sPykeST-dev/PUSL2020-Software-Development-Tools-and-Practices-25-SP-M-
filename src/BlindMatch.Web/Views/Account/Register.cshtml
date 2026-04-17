@@ -1,81 +1,164 @@
 @model BlindMatch.Web.ViewModels.RegisterViewModel
 @{
     ViewData["Title"] = "Create account";
+    Layout = null;
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — BlindMatch</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        body {
+            background-color: #0c0a07 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-height: 100vh !important;
+            margin: 0;
+            padding: 1.5rem 1rem;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.08;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 250px 250px;
+        }
+        body > div {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
+<div style="width:100%;max-width:460px">
 
-        <h1 class="h4 mb-4">Student registration</h1>
-
-        <form asp-action="Register" asp-controller="Account" method="post">
-
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-            <div class="row mb-3">
-                <div class="col">
-                    <label asp-for="FirstName" class="form-label"></label>
-                    <input asp-for="FirstName" class="form-control" />
-                    <span asp-validation-for="FirstName" class="text-danger small"></span>
-                </div>
-                <div class="col">
-                    <label asp-for="LastName" class="form-label"></label>
-                    <input asp-for="LastName" class="form-control" />
-                    <span asp-validation-for="LastName" class="text-danger small"></span>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label"></label>
-                <input asp-for="Email" class="form-control" autocomplete="email" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Programme" class="form-label"></label>
-                <input asp-for="Programme" class="form-control" placeholder="e.g. BSc Computer Science" />
-                <span asp-validation-for="Programme" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="YearOfStudy" class="form-label"></label>
-                <select asp-for="YearOfStudy" class="form-select">
-                    <option value="">— select —</option>
-                    @for (int i = 1; i <= 5; i++)
-                    {
-                        <option value="@i">Year @i</option>
-                    }
-                </select>
-                <span asp-validation-for="YearOfStudy" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label"></label>
-                <input asp-for="Password" class="form-control" autocomplete="new-password" />
-                <div class="form-text">
-                    At least 8 characters with an uppercase letter, number, and special character.
-                </div>
-                <span asp-validation-for="Password" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="ConfirmPassword" class="form-label"></label>
-                <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
-                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Create account</button>
-
-        </form>
-
-        <p class="mt-3 small">
-            Already have an account?
-            <a asp-action="Login" asp-controller="Account">Sign in</a>
-        </p>
-
+    <div class="text-center mb-4">
+        <a href="/" style="font-weight:800;font-size:1.75rem;letter-spacing:.18em;text-transform:uppercase;color:#c8a45a;text-decoration:none;">BlindMatch</a>
     </div>
+
+    <div class="card">
+        <div class="card-body p-4">
+
+            <h1 class="h5 fw-bold mb-4" style="color:#ede8df;letter-spacing:.06em;text-transform:uppercase;font-size:.9rem!important">Create your account</h1>
+
+            <form asp-action="Register" asp-controller="Account" method="post">
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label asp-for="FirstName" class="form-label"></label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                    </div>
+                    <div class="col">
+                        <label asp-for="LastName" class="form-label"></label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" autocomplete="email" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Programme" class="form-label"></label>
+                    <input asp-for="Programme" class="form-control" placeholder="e.g. BSc Computer Science" />
+                    <span asp-validation-for="Programme" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="YearOfStudy" class="form-label"></label>
+                    <input type="hidden" asp-for="YearOfStudy" id="YearOfStudyInput" />
+                    <div class="dropdown w-100">
+                        <button type="button" id="yearDropdownBtn"
+                                class="form-control d-flex justify-content-between align-items-center text-start"
+                                style="cursor:pointer"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <span id="yearDropdownLabel" style="color:var(--text-subtle)">— select —</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:.5"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <ul class="dropdown-menu w-100" style="background:var(--surface-2);border-color:var(--border-light);padding:.35rem">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <li><a class="dropdown-item year-option" href="#" data-value="@i"
+                                       style="font-size:.85rem;border-radius:.35rem;color:var(--text-muted);padding:.45rem .75rem">Year @i</a></li>
+                            }
+                        </ul>
+                    </div>
+                    <span asp-validation-for="YearOfStudy" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                    <div class="form-text">At least 8 characters with an uppercase letter, number, and special character.</div>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="ConfirmPassword" class="form-label"></label>
+                    <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Create account</button>
+
+            </form>
+
+            <div class="login-footer-links mt-3">
+                <span class="login-footer-text">Already have an account? <a asp-action="Login" asp-controller="Account" class="login-footer-link">Sign in</a></span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="text-center mt-3">
+        <a href="/" class="login-back-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:.35rem;vertical-align:middle">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>Back to home
+        </a>
+    </div>
+
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    document.querySelectorAll('.year-option').forEach(function(item) {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('YearOfStudyInput').value = this.dataset.value;
+            var label = document.getElementById('yearDropdownLabel');
+            label.textContent = this.textContent;
+            label.style.color = 'var(--text)';
+            document.querySelectorAll('.year-option').forEach(function(o) {
+                o.style.color = 'var(--text-muted)';
+                o.style.backgroundColor = '';
+            });
+            this.style.color = 'var(--accent)';
+        });
+    });
+</script>
+
+</body>
+</html>

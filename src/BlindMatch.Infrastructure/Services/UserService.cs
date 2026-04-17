@@ -20,17 +20,41 @@ public class UserService : IUserService
 
     public async Task<(IdentityResult Result, ApplicationUser? User)> CreateUserAsync(
         string firstName, string lastName, string email, string password, string role,
-        string? programme = null, int? yearOfStudy = null)
+        string? programme = null, int? yearOfStudy = null, string? department = null)
     {
-        var user = new ApplicationUser
+        ApplicationUser user = role switch
         {
-            FirstName   = firstName,
-            LastName    = lastName,
-            Email       = email,
-            UserName    = email,
-            Programme   = programme,
-            YearOfStudy = yearOfStudy,
-            IsActive    = true
+            Roles.Supervisor => new Supervisor
+            {
+                FirstName       = firstName,
+                LastName        = lastName,
+                Email           = email,
+                UserName        = email,
+                IsActive        = true,
+                EmailConfirmed  = true,
+                Department      = department ?? string.Empty,
+                MaxProjects     = 3,
+                CurrentProjects = 0
+            },
+            Roles.Student => new Student
+            {
+                FirstName   = firstName,
+                LastName    = lastName,
+                Email       = email,
+                UserName    = email,
+                Programme   = programme,
+                YearOfStudy = yearOfStudy,
+                IsActive    = true
+            },
+            _ => new ApplicationUser
+            {
+                FirstName   = firstName,
+                LastName    = lastName,
+                Email       = email,
+                UserName    = email,
+                IsActive    = true,
+                EmailConfirmed = true
+            }
         };
 
         var result = await _userManager.CreateAsync(user, password);

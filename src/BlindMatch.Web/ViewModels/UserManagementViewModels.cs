@@ -38,6 +38,10 @@ public class CreateUserViewModel
     
     [Required]
     public string Role { get; set; } = string.Empty;
+
+    [Display(Name = "Department")]
+    [StringLength(100)]
+    public string? Department { get; set; }
 }
 
 public class ChangeRoleViewModel
