@@ -6,10 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlindMatch.Tests.IntegrationTests.Web;
 
-/// <summary>
-/// Full end-to-end HTTP tests that exercise the blind-match flow using an
-/// InMemory database and a fake authentication handler.
-/// </summary>
 public class BlindMatchFlowTests : IClassFixture<BlindMatchWebApplicationFactory>
 {
     private readonly BlindMatchWebApplicationFactory _factory;
@@ -19,12 +15,9 @@ public class BlindMatchFlowTests : IClassFixture<BlindMatchWebApplicationFactory
         _factory = factory;
     }
 
-    // ── TC-FLOW-01: Full confirm-interest flow via HTTP ───────────────────────
-
     [Fact]
     public async Task ConfirmInterest_ValidFlow_CreatesMatchAndReveal()
     {
-        // ── Arrange: seed data directly into the InMemory DB ─────────────────
         using var seedScope = _factory.Services.CreateScope();
         var ctx = seedScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         ctx.Database.EnsureCreated();
@@ -43,7 +36,6 @@ public class BlindMatchFlowTests : IClassFixture<BlindMatchWebApplicationFactory
             .WithId(50).WithSupervisorId(supervisorId).WithProposalId(100).Build());
         await ctx.SaveChangesAsync();
 
-        // ── Act Step 1: GET confirm page to obtain CSRF token ─────────────────
         var client  = _factory.CreateAuthenticatedClient(supervisorId, "Supervisor");
         var getResp = await client.GetAsync("/Interest/ConfirmInterest/50");
         getResp.StatusCode.Should().Be(HttpStatusCode.OK,
@@ -52,7 +44,6 @@ public class BlindMatchFlowTests : IClassFixture<BlindMatchWebApplicationFactory
         var html  = await getResp.Content.ReadAsStringAsync();
         var token = BlindMatchWebApplicationFactory.ExtractAntiForgeryToken(html);
 
-        // ── Act Step 2: POST confirm ──────────────────────────────────────────
         var formData = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["InterestId"]                 = "50",
@@ -61,12 +52,10 @@ public class BlindMatchFlowTests : IClassFixture<BlindMatchWebApplicationFactory
 
         var postResp = await client.PostAsync("/Interest/ConfirmInterest", formData);
 
-        // Expect redirect to MySupervisedMatches (or 200 if AllowAutoRedirect = true)
         postResp.StatusCode.Should().BeOneOf(
-            HttpStatusCode.Found,      // 302 redirect
-            HttpStatusCode.OK);        // if auto-redirected to matches page
+            HttpStatusCode.Found,
+            HttpStatusCode.OK);
 
-        // ── Assert: verify DB state via a fresh context scope ─────────────────
         using var verifyScope = _factory.Services.CreateScope();
         var db = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
@@ -87,12 +76,9 @@ public class BlindMatchFlowTests : IClassFixture<BlindMatchWebApplicationFactory
         match.Status.Should().Be(MatchStatus.Pending);
     }
 
-    // ── TC-FLOW-02: Supervisor browse does not expose student identity ─────────
-
     [Fact]
     public async Task SupervisorBrowse_ResponseBody_DoesNotContainStudentIdentity()
     {
-        // ── Arrange ───────────────────────────────────────────────────────────
         using var seedScope = _factory.Services.CreateScope();
         var ctx = seedScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         ctx.Database.EnsureCreated();
@@ -113,7 +99,6 @@ public class BlindMatchFlowTests : IClassFixture<BlindMatchWebApplicationFactory
             await ctx.SaveChangesAsync();
         }
 
-        // ── Act ───────────────────────────────────────────────────────────────
         var client = _factory.CreateAuthenticatedClient(supervisorId, "Supervisor");
         var resp   = await client.GetAsync("/SupervisorBrowse/Index");
 
@@ -121,12 +106,9 @@ public class BlindMatchFlowTests : IClassFixture<BlindMatchWebApplicationFactory
 
         var body = await resp.Content.ReadAsStringAsync();
 
-        // ── Assert: student identity must not appear ───────────────────────────
         body.Should().NotContain(studentId,   "student internal ID must never appear in browse view");
         body.Should().NotContain(studentEmail,"student email must never appear in browse view");
         body.Should().NotContain(studentName, "student name must never appear in browse view");
-
-        // The anonymised project code SHOULD appear
         body.Should().Contain("Project #", "proposals should show as anonymised project codes");
     }
 }

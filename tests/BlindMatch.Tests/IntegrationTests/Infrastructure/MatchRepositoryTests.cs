@@ -12,8 +12,6 @@ public class MatchRepositoryTests
     private static ApplicationDbContext CreateContext() =>
         new TestDatabaseFixture().CreateContext();
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
     private static async Task SeedMatch(
         ApplicationDbContext ctx,
         int id,
@@ -36,7 +34,6 @@ public class MatchRepositoryTests
 
     private static async Task SeedMatchSet(ApplicationDbContext ctx)
     {
-        // Seed Student and Supervisor entities required for navigation properties
         ctx.Students.Add(new StudentBuilder().WithId("stu-m-1").Build());
         ctx.Students.Add(new StudentBuilder().WithId("stu-m-2").Build());
         ctx.Students.Add(new StudentBuilder().WithId("stu-m-3").Build());
@@ -55,8 +52,6 @@ public class MatchRepositoryTests
         await SeedMatch(ctx, 4, "stu-m-4", "sup-m-1", 103, MatchStatus.Approved);
     }
 
-    // ── CountByStatusAsync ────────────────────────────────────────────────────
-
     [Fact]
     public async Task CountByStatus_ReturnsCorrectCountForEachStatus()
     {
@@ -69,8 +64,6 @@ public class MatchRepositoryTests
         (await repo.CountByStatusAsync(MatchStatus.Approved)).Should().Be(1);
         (await repo.CountByStatusAsync(MatchStatus.Rejected)).Should().Be(0);
     }
-
-    // ── GetByStatusAsync ──────────────────────────────────────────────────────
 
     [Fact]
     public async Task GetByStatus_ReturnsOnlyMatchesWithRequestedStatus()
@@ -96,8 +89,6 @@ public class MatchRepositoryTests
 
         rejected.Should().BeEmpty();
     }
-
-    // ── ExistsForProposalAsync ────────────────────────────────────────────────
 
     [Fact]
     public async Task ExistsForProposal_WhenMatchExists_ReturnsTrue()

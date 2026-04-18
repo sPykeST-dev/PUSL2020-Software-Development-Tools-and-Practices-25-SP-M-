@@ -12,8 +12,6 @@ public class ProposalRepositoryTests
     private static ApplicationDbContext CreateContext() =>
         new TestDatabaseFixture().CreateContext();
 
-    // ── GetAllSubmittedAsync ──────────────────────────────────────────────────
-
     [Fact]
     public async Task GetAllSubmitted_ReturnsOnlyProposalsWithSubmittedAt()
     {
@@ -22,13 +20,11 @@ public class ProposalRepositoryTests
         var student2   = new StudentBuilder().WithId("stu-sub-2").Build();
         ctx.Students.AddRange(student1, student2);
 
-        // One submitted, one draft (SubmittedAt = null)
         ctx.Proposals.Add(new ProposalBuilder().WithId(10).WithStudentId("stu-sub-1")
             .WithStatus(ProposalStatus.Submitted).Build());
         ctx.Proposals.Add(new ProposalBuilder().WithId(11).WithStudentId("stu-sub-2")
             .WithStatus(ProposalStatus.Draft).Build());
 
-        // Manually clear SubmittedAt for the draft
         var draft = ctx.Proposals.Find(11)!;
         draft.SubmittedAt = null;
         await ctx.SaveChangesAsync();
@@ -63,11 +59,9 @@ public class ProposalRepositoryTests
         var result = await repo.GetAllSubmittedAsync();
 
         result.Should().HaveCount(2);
-        result[0].StudentId.Should().Be("stu-ord-2"); // later first
+        result[0].StudentId.Should().Be("stu-ord-2");
         result[1].StudentId.Should().Be("stu-ord-1");
     }
-
-    // ── StudentHasProposalAsync ───────────────────────────────────────────────
 
     [Fact]
     public async Task StudentHasProposal_WhenExists_ReturnsTrue()
@@ -93,8 +87,6 @@ public class ProposalRepositoryTests
 
         result.Should().BeFalse();
     }
-
-    // ── GetByIdForStudentAsync ────────────────────────────────────────────────
 
     [Fact]
     public async Task GetByIdForStudent_CorrectOwner_ReturnsProposal()
@@ -125,13 +117,10 @@ public class ProposalRepositoryTests
         result.Should().BeNull();
     }
 
-    // ── GetByStudentIdAsync includes ResearchArea ─────────────────────────────
-
     [Fact]
     public async Task GetByStudentId_IncludesResearchArea()
     {
         using var ctx = CreateContext();
-        // ResearchArea Id=1 is already seeded via HasData — just reference it
         ctx.Students.Add(new StudentBuilder().WithId("stu-ra-1").Build());
         ctx.Proposals.Add(new ProposalBuilder().WithId(50).WithStudentId("stu-ra-1")
             .WithResearchAreaId(1).Build());

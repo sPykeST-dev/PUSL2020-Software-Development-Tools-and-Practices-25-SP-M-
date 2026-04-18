@@ -7,17 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlindMatch.Tests.IntegrationTests.Web;
 
-/// <summary>
-/// Verifies that every role-guarded route enforces access correctly.
-/// <para>
-/// Because the test auth scheme (header-based fake auth) is used instead of the
-/// real cookie scheme, unauthenticated requests receive <c>401 Unauthorized</c>
-/// and wrong-role requests receive <c>403 Forbidden</c> — not 302 redirects.
-/// </para>
-/// Test users are seeded directly into the InMemory DB so that the
-/// <c>ActiveUserFilter</c> (which redirects non-existent users to login)
-/// does not interfere with authorised-user tests.
-/// </summary>
 public class AccessControlTests : IClassFixture<BlindMatchWebApplicationFactory>
 {
     private readonly HttpClient _anonClient;
@@ -28,7 +17,6 @@ public class AccessControlTests : IClassFixture<BlindMatchWebApplicationFactory>
 
     public AccessControlTests(BlindMatchWebApplicationFactory factory)
     {
-        // Seed test user entities so ActiveUserFilter finds them in the DB.
         using var scope = factory.Services.CreateScope();
         var ctx = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         ctx.Database.EnsureCreated();
@@ -79,8 +67,6 @@ public class AccessControlTests : IClassFixture<BlindMatchWebApplicationFactory>
         ctx.SaveChanges();
     }
 
-    // ── Login page is publicly accessible ────────────────────────────────────
-
     [Fact]
     public async Task Login_Anonymous_Returns200()
     {
@@ -88,14 +74,11 @@ public class AccessControlTests : IClassFixture<BlindMatchWebApplicationFactory>
         resp.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
-    // ── Proposal/Create — Students only ──────────────────────────────────────
-
     [Fact]
     public async Task ProposalCreate_Anonymous_Returns401()
     {
         var resp = await _anonClient.GetAsync("/Proposal/Create");
 
-        // Test scheme: unauthenticated → 401 (no cookie redirect in test environment)
         resp.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
@@ -104,7 +87,6 @@ public class AccessControlTests : IClassFixture<BlindMatchWebApplicationFactory>
     {
         var resp = await _supervisorClient.GetAsync("/Proposal/Create");
 
-        // Supervisor is authenticated but wrong role → 403 Forbidden
         resp.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
@@ -113,15 +95,11 @@ public class AccessControlTests : IClassFixture<BlindMatchWebApplicationFactory>
     {
         var resp = await _studentClient.GetAsync("/Proposal/Create");
 
-        // Student is authorised; action may render 200 or redirect within the
-        // student flow (e.g. to Details if they already have a proposal).
         resp.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized,
             "student should not receive a challenge");
         resp.StatusCode.Should().NotBe(HttpStatusCode.Forbidden,
             "student should not be forbidden");
     }
-
-    // ── UserManagement — Admin only ───────────────────────────────────────────
 
     [Fact]
     public async Task UserManagement_Anonymous_Returns401()
@@ -147,8 +125,6 @@ public class AccessControlTests : IClassFixture<BlindMatchWebApplicationFactory>
         resp.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
-    // ── Audit Log — Admin only (Razor Page) ──────────────────────────────────
-
     [Fact]
     public async Task AuditLog_Anonymous_Returns401()
     {
@@ -165,8 +141,6 @@ public class AccessControlTests : IClassFixture<BlindMatchWebApplicationFactory>
         resp.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
-    // ── Module Leader dashboard — ModuleLeader only (Razor Page) ─────────────
-
     [Fact]
     public async Task Dashboard_Anonymous_Returns401()
     {
@@ -182,8 +156,6 @@ public class AccessControlTests : IClassFixture<BlindMatchWebApplicationFactory>
 
         resp.StatusCode.Should().Be(HttpStatusCode.OK);
     }
-
-    // ── SupervisorBrowse — Supervisors only ───────────────────────────────────
 
     [Fact]
     public async Task BrowseProposals_Anonymous_Returns401()

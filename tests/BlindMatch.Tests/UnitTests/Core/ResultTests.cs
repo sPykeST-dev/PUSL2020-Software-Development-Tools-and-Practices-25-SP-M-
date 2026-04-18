@@ -4,8 +4,6 @@ namespace BlindMatch.Tests.UnitTests.Core;
 
 public class ResultTests
 {
-    // ── TC-RESULT-01 ──────────────────────────────────────────────────────────
-
     [Fact]
     public void Success_IsSuccessTrue_ErrorNull()
     {
@@ -15,8 +13,6 @@ public class ResultTests
         result.Error.Should().BeNull();
     }
 
-    // ── TC-RESULT-02 ──────────────────────────────────────────────────────────
-
     [Fact]
     public void Failure_IsSuccessFalse_ErrorSet()
     {
@@ -25,8 +21,6 @@ public class ResultTests
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().NotBeNullOrEmpty();
     }
-
-    // ── TC-RESULT-03 ──────────────────────────────────────────────────────────
 
     [Fact]
     public void Failure_PreservesErrorMessage()

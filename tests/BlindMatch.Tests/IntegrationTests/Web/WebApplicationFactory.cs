@@ -14,14 +14,8 @@ using Microsoft.Extensions.Options;
 
 namespace BlindMatch.Tests.IntegrationTests.Web;
 
-/// <summary>
-/// Custom <see cref="WebApplicationFactory{TProgram}"/> that replaces the SQL Server
-/// database with an EF Core InMemory store and swaps Identity cookie auth for a
-/// simple header-based fake auth scheme (X-Test-UserId / X-Test-UserRole).
-/// </summary>
 public class BlindMatchWebApplicationFactory : WebApplicationFactory<Program>
 {
-    // Shared database name so all clients in the same test class see the same data.
     public string DatabaseName { get; } = "BlindMatchFunctional_" + Guid.NewGuid();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -30,16 +24,10 @@ public class BlindMatchWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
-            // ── Replace real DbContext with InMemory ─────────────────────────
-            // Remove DbContextOptions<T> registered by AddInfrastructure
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
             if (descriptor is not null) services.Remove(descriptor);
 
-            // Also remove all IDbContextOptionsConfiguration<T> entries — these hold
-            // the SQL Server provider configuration added by AddInfrastructure.
-            // Without removing them, both SqlServer and InMemory providers end up
-            // registered in the same EF Core internal service provider, which throws.
             var configType = typeof(IDbContextOptionsConfiguration<ApplicationDbContext>);
             var configDescriptors = services.Where(d => d.ServiceType == configType).ToList();
             foreach (var d in configDescriptors) services.Remove(d);
@@ -48,11 +36,9 @@ public class BlindMatchWebApplicationFactory : WebApplicationFactory<Program>
                 opts.UseInMemoryDatabase(DatabaseName)
                     .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning)));
 
-            // ── Register fake auth scheme ────────────────────────────────────
             services.AddAuthentication()
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
 
-            // Override Identity's default schemes so our handler runs first.
             services.PostConfigure<AuthenticationOptions>(options =>
             {
                 options.DefaultAuthenticateScheme = "Test";
@@ -61,9 +47,6 @@ public class BlindMatchWebApplicationFactory : WebApplicationFactory<Program>
         });
     }
 
-    // ── Helper factories ─────────────────────────────────────────────────────
-
-    /// <summary>Creates a client that sends the given userId and role on every request.</summary>
     public HttpClient CreateAuthenticatedClient(string userId, string role,
         bool allowAutoRedirect = false)
     {
@@ -77,7 +60,6 @@ public class BlindMatchWebApplicationFactory : WebApplicationFactory<Program>
         return client;
     }
 
-    /// <summary>Creates an anonymous client (no auth headers).</summary>
     public HttpClient CreateAnonClient(bool allowAutoRedirect = false) =>
         CreateClient(new WebApplicationFactoryClientOptions
         {
@@ -85,20 +67,14 @@ public class BlindMatchWebApplicationFactory : WebApplicationFactory<Program>
             HandleCookies     = true
         });
 
-    /// <summary>Seeds data directly into the shared InMemory database.</summary>
     public ApplicationDbContext GetSeedContext()
     {
         var scope = Services.CreateScope();
         return scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     }
 
-    /// <summary>
-    /// Extracts the ASP.NET Core anti-forgery token from a page's HTML body.
-    /// </summary>
     public static string ExtractAntiForgeryToken(string html)
     {
-        // AntiForgeryToken renders: name="__RequestVerificationToken" type="hidden" value="..."
-        // The regex must tolerate attributes (e.g. type="hidden") between name and value.
         var regex = new System.Text.RegularExpressions.Regex(
             @"name=""__RequestVerificationToken""[^>]*value=""([^""]+)""");
         var m = regex.Match(html);
@@ -109,12 +85,6 @@ public class BlindMatchWebApplicationFactory : WebApplicationFactory<Program>
     }
 }
 
-// ── Fake authentication handler ───────────────────────────────────────────────
-
-/// <summary>
-/// Reads <c>X-Test-UserId</c> and <c>X-Test-UserRole</c> request headers and
-/// builds a <see cref="ClaimsPrincipal"/> without touching ASP.NET Core Identity.
-/// </summary>
 public class TestAuthHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
     ILoggerFactory logger,
