@@ -22,7 +22,6 @@ public class MatchController : Controller
         _identityRevealService = identityRevealService;
     }
 
-    //Students see their proposal's match status and the revealed supervisor details.
     [HttpGet]
     [Authorize(Policy = Policies.StudentOnly)]
     public async Task<IActionResult> MyMatch()
@@ -52,9 +51,6 @@ public class MatchController : Controller
 
         return View(vm);
     }
-
-    // Supervisors see all their confirmed matches with revealed student details.
-    //This is where they land after confirming interest.
 
     [HttpGet]
     [Authorize(Policy = Policies.SupervisorOnly)]

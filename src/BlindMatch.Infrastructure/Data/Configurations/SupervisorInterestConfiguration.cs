@@ -28,7 +28,6 @@ public class SupervisorInterestConfiguration : IEntityTypeConfiguration<Supervis
         builder.HasIndex(si => new { si.SupervisorId, si.ProposalId })
             .IsUnique();
 
-        // Relationships
         builder.HasOne(si => si.Supervisor)
             .WithMany(s => s.Interests)
             .HasForeignKey(si => si.SupervisorId)

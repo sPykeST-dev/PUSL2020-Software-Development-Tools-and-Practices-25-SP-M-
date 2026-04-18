@@ -32,7 +32,6 @@ public static class InfrastructureDI
         .AddDefaultTokenProviders()
         .AddClaimsPrincipalFactory<AppClaimsFactory>();
 
-        // Repositories
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<ISupervisorRepository, SupervisorRepository>();
         services.AddScoped<IStudentRepository, StudentRepository>();
@@ -42,7 +41,6 @@ public static class InfrastructureDI
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         services.AddScoped<IAuditRepository, AuditRepository>();
 
-        // Services
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<SupervisorService>();
         services.AddScoped<IProposalService, ProposalService>();

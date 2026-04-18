@@ -36,7 +36,6 @@ public class Proposal
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? WithdrawnAt { get; set; }
 
-    // Navigation properties
     public ResearchArea ResearchArea { get; set; } = null!;
     public Student Student { get; set; } = null!;
     public ICollection<SupervisorInterest> Interests { get; set; } = new List<SupervisorInterest>();

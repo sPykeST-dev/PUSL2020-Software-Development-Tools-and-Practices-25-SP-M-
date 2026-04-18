@@ -22,7 +22,6 @@ public class SupervisorInterest
 
     public DateTime? ConfirmedAt { get; set; }
 
-    // Navigation properties
     public Supervisor Supervisor { get; set; } = null!;
     public Proposal Proposal { get; set; } = null!;
 }

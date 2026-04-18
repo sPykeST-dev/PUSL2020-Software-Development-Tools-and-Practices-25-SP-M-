@@ -22,6 +22,5 @@ public class AuditEvent
     [StringLength(500)]
     public string? Details { get; set; }
 
-    // Navigation property
     public ApplicationUser? User { get; set; }
 }

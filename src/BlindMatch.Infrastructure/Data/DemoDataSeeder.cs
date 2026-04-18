@@ -20,7 +20,6 @@ public static class DemoDataSeeder
 
         const string pwd = "Password123!";
 
-        // ── Module Leaders ───────────────────────────────────────────────────────
         var ml1 = await CreateAsync(userManager, new ApplicationUser
         {
             UserName = "tommy.dwight@nsbm.ac.lk", Email = "tommy.dwight@nsbm.ac.lk",
@@ -39,7 +38,6 @@ public static class DemoDataSeeder
             FirstName = "Robert", LastName = "Chen", IsActive = true, EmailConfirmed = true
         }, pwd, Roles.ModuleLeader);
 
-        // ── Supervisors ──────────────────────────────────────────────────────────
         var sup1 = new Supervisor
         {
             UserName = "john.doe@nsbm.ac.lk", Email = "john.doe@nsbm.ac.lk",
@@ -64,7 +62,6 @@ public static class DemoDataSeeder
         };
         await CreateAsync(userManager, sup3, pwd, Roles.Supervisor);
 
-        // ── Students ─────────────────────────────────────────────────────────────
         var stu1 = new Student
         {
             UserName = "alex.smith@student.nsbm.ac.lk", Email = "alex.smith@student.nsbm.ac.lk",
@@ -89,7 +86,6 @@ public static class DemoDataSeeder
         };
         await CreateAsync(userManager, stu3, pwd, Roles.Student);
 
-        // ── Supervisor research areas ────────────────────────────────────────────
         var areas = await db.ResearchAreas.ToDictionaryAsync(a => a.Id);
 
         var dbSup1 = await db.Supervisors.Include(s => s.PreferredResearchAreas).FirstAsync(s => s.Email == sup1.Email);
@@ -107,7 +103,6 @@ public static class DemoDataSeeder
 
         await db.SaveChangesAsync();
 
-        // ── Proposals ────────────────────────────────────────────────────────────
         var p1SubmittedAt = new DateTime(2026, 4,  8, 10, 30, 0, DateTimeKind.Utc);
         var p2SubmittedAt = new DateTime(2026, 4,  9,  9, 15, 0, DateTimeKind.Utc);
         var p3SubmittedAt = new DateTime(2026, 4, 10, 11, 30, 0, DateTimeKind.Utc);
@@ -154,7 +149,6 @@ public static class DemoDataSeeder
         db.Proposals.AddRange(p1, p2, p3);
         await db.SaveChangesAsync();
 
-        // ── Supervisor interests ─────────────────────────────────────────────────
         var i1 = new SupervisorInterest   // John → Alex (confirmed)
         {
             SupervisorId = dbSup1.Id, ProposalId = p1.Id,
@@ -185,7 +179,6 @@ public static class DemoDataSeeder
         db.SupervisorInterests.AddRange(i1, i2, i3, i4);
         await db.SaveChangesAsync();
 
-        // ── Matches ──────────────────────────────────────────────────────────────
         var m1 = new Match   // Alex + John → Approved
         {
             StudentId    = stu1.Id,
@@ -207,7 +200,6 @@ public static class DemoDataSeeder
         db.Matches.AddRange(m1, m2);
         await db.SaveChangesAsync();
 
-        // ── Identity reveals ─────────────────────────────────────────────────────
         db.IdentityReveals.AddRange(
             new IdentityReveal
             {
@@ -222,7 +214,6 @@ public static class DemoDataSeeder
         );
         await db.SaveChangesAsync();
 
-        // ── Audit events (chronological) ─────────────────────────────────────────
         db.AuditEvents.AddRange(
             new AuditEvent
             {

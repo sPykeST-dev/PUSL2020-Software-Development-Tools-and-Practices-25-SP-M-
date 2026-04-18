@@ -41,7 +41,6 @@ public class ModuleLeaderService : IMatchApprovalService
         match.ApprovedAt = DateTime.UtcNow;
         await _matchRepository.UpdateAsync(match);
 
-        // Update proposal status
         var proposal = await _proposalRepository.GetByIdAsync(match.ProposalId);
         if (proposal != null)
         {
@@ -49,7 +48,6 @@ public class ModuleLeaderService : IMatchApprovalService
             await _proposalRepository.UpdateAsync(proposal);
         }
 
-        // Increment supervisor project count
         var supervisor = await _supervisorRepository.GetByIdAsync(match.SupervisorId);
         if (supervisor != null)
         {
@@ -57,7 +55,6 @@ public class ModuleLeaderService : IMatchApprovalService
             await _supervisorRepository.UpdateAsync(supervisor);
         }
 
-        // Audit log
         await _auditRepository.AddAsync(new AuditEvent
         {
             Action = "MatchApproved",
@@ -87,14 +84,13 @@ public class ModuleLeaderService : IMatchApprovalService
         match.RejectionReason = reason.Trim();
         await _matchRepository.UpdateAsync(match);
 
-        // Revert proposal to Submitted
         var proposal = await _proposalRepository.GetByIdAsync(match.ProposalId);
         if (proposal != null)
         {
             proposal.Status = ProposalStatus.Submitted;
             await _proposalRepository.UpdateAsync(proposal);
 
-            // Clear interests for this proposal to allow re-browsing
+            // Reset confirmed interests back to Pending so the proposal can be re-browsed.
             var interests = await _interestRepository.FindAsync(i => i.ProposalId == match.ProposalId);
             foreach (var interest in interests)
             {
@@ -106,7 +102,6 @@ public class ModuleLeaderService : IMatchApprovalService
             }
         }
 
-        // Decrement supervisor project count
         var supervisor = await _supervisorRepository.GetByIdAsync(match.SupervisorId);
         if (supervisor != null && supervisor.CurrentProjects > 0)
         {
@@ -114,7 +109,6 @@ public class ModuleLeaderService : IMatchApprovalService
             await _supervisorRepository.UpdateAsync(supervisor);
         }
 
-        // Audit log
         await _auditRepository.AddAsync(new AuditEvent
         {
             Action = "MatchRejected",
@@ -138,7 +132,6 @@ public class ModuleLeaderService : IMatchApprovalService
 
         var oldSupervisorId = match.SupervisorId;
 
-        // Decrement old supervisor
         var oldSupervisor = await _supervisorRepository.GetByIdAsync(oldSupervisorId);
         if (oldSupervisor != null && oldSupervisor.CurrentProjects > 0)
         {
@@ -146,11 +139,9 @@ public class ModuleLeaderService : IMatchApprovalService
             await _supervisorRepository.UpdateAsync(oldSupervisor);
         }
 
-        // Assign new supervisor
         match.SupervisorId = newSupervisorId;
         await _matchRepository.UpdateAsync(match);
 
-        // Increment new supervisor
         var newSupervisor = await _supervisorRepository.GetByIdAsync(newSupervisorId);
         if (newSupervisor != null)
         {
@@ -158,7 +149,6 @@ public class ModuleLeaderService : IMatchApprovalService
             await _supervisorRepository.UpdateAsync(newSupervisor);
         }
 
-        // Audit log
         await _auditRepository.AddAsync(new AuditEvent
         {
             Action = "MatchReassigned",
@@ -181,7 +171,6 @@ public class ModuleLeaderService : IMatchApprovalService
         proposal.Status = newStatus;
         await _proposalRepository.UpdateAsync(proposal);
 
-        // Audit log
         await _auditRepository.AddAsync(new AuditEvent
         {
             Action = "ProposalStatusChanged",

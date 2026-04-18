@@ -16,7 +16,6 @@ public class Supervisor : ApplicationUser
     [Required]
     public int CurrentProjects { get; set; } = 0;
 
-    // Navigation properties
     public ICollection<SupervisorInterest> Interests { get; set; } = new List<SupervisorInterest>();
     public ICollection<ResearchArea> PreferredResearchAreas { get; set; } = new List<ResearchArea>();
 }

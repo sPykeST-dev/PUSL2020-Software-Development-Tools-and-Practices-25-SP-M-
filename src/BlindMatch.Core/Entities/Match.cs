@@ -21,14 +21,12 @@ public class Match
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    // Module Leader approval dashboard
     public DateTime? ApprovedAt { get; set; }
     public DateTime? RejectedAt { get; set; }
 
     [StringLength(500)]
     public string RejectionReason { get; set; } = string.Empty;
 
-    // Navigation properties
     public Proposal Proposal { get; set; } = null!;
     public ApplicationUser Student { get; set; } = null!;
     public Supervisor Supervisor { get; set; } = null!;
