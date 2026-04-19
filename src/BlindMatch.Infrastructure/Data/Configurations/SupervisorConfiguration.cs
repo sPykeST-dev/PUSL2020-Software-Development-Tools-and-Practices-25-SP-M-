@@ -20,7 +20,6 @@ public class SupervisorConfiguration : IEntityTypeConfiguration<Supervisor>
             .IsRequired()
             .HasDefaultValue(0);
 
-        // Many-to-many with ResearchArea
         builder.HasMany(s => s.PreferredResearchAreas)
             .WithMany(ra => ra.Supervisors)
             .UsingEntity<Dictionary<string, object>>(

@@ -6,11 +6,6 @@ using Match = BlindMatch.Core.Entities.Match;
 
 namespace BlindMatch.Tests.IntegrationTests.Infrastructure;
 
-/// <summary>
-/// Factory for fresh InMemory <see cref="ApplicationDbContext"/> instances.
-/// Each call to <see cref="CreateContext"/> with a unique name gives an isolated,
-/// empty database. ResearchAreas 1–7 are always present via HasData seed.
-/// </summary>
 public class TestDatabaseFixture : IDisposable
 {
     public ApplicationDbContext CreateContext(string? dbName = null)
@@ -21,11 +16,9 @@ public class TestDatabaseFixture : IDisposable
             .Options;
 
         var ctx = new ApplicationDbContext(opts);
-        ctx.Database.EnsureCreated(); // applies HasData seeds (ResearchAreas 1–7)
+        ctx.Database.EnsureCreated();
         return ctx;
     }
-
-    // ── Synchronous seed helpers ──────────────────────────────────────────────
 
     public static void SeedStudent(ApplicationDbContext ctx, Student student)
     {

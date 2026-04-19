@@ -9,13 +9,10 @@ namespace BlindMatch.Tests.UnitTests.Services;
 
 public class ProposalServiceTests
 {
-    // xUnit creates a new instance per test, so these mocks are fresh each time
     private readonly Mock<IProposalRepository>      _repo     = new();
     private readonly Mock<IRepository<ResearchArea>> _areaRepo = new();
 
     private ProposalService CreateService() => new(_repo.Object, _areaRepo.Object);
-
-    // ── Helpers ──────────────────────────────────────────────────────────────
 
     private void SetupAreaExists(bool exists = true) =>
         _areaRepo.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<ResearchArea, bool>>>()))
@@ -28,8 +25,6 @@ public class ProposalServiceTests
     private void SetupGetByIdForStudent(Proposal? proposal) =>
         _repo.Setup(r => r.GetByIdForStudentAsync(It.IsAny<int>(), It.IsAny<string>()))
              .ReturnsAsync(proposal);
-
-    // ── CreateAsync ───────────────────────────────────────────────────────────
 
     [Fact]
     public async Task Create_EmptyStudentId_ReturnsFailure()
@@ -91,8 +86,6 @@ public class ProposalServiceTests
             p.WithdrawnAt == null
         )), Times.Once);
     }
-
-    // ── UpdateAsync ───────────────────────────────────────────────────────────
 
     [Fact]
     public async Task Update_ProposalNotFound_ReturnsFailure()
@@ -162,8 +155,6 @@ public class ProposalServiceTests
             p.UpdatedAt       >= before
         )), Times.Once);
     }
-
-    // ── WithdrawAsync ─────────────────────────────────────────────────────────
 
     [Fact]
     public async Task Withdraw_ProposalNotFound_ReturnsFailure()

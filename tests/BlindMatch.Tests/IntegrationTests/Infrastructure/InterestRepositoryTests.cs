@@ -28,8 +28,6 @@ public class InterestRepositoryTests
         await ctx.SaveChangesAsync();
     }
 
-    // ── ExistsAsync ───────────────────────────────────────────────────────────
-
     [Fact]
     public async Task Exists_WhenInterestPresent_ReturnsTrue()
     {
@@ -77,8 +75,6 @@ public class InterestRepositoryTests
         result.Should().BeFalse();
     }
 
-    // ── GetBySupervisorAndProposalAsync ───────────────────────────────────────
-
     [Fact]
     public async Task GetBySupervisorAndProposal_WhenExists_ReturnsInterest()
     {
@@ -102,8 +98,6 @@ public class InterestRepositoryTests
 
         result.Should().BeNull();
     }
-
-    // ── GetInterestsBySupervisorAsync ─────────────────────────────────────────
 
     [Fact]
     public async Task GetInterestsBySupervisor_ReturnsOnlyThatSupervisorsInterests()
@@ -132,8 +126,6 @@ public class InterestRepositoryTests
         result.Should().HaveCount(2);
         result.Should().AllSatisfy(i => i.SupervisorId.Should().Be("sup-gi-1"));
     }
-
-    // ── ConfirmInterestAsync ──────────────────────────────────────────────────
 
     [Fact]
     public async Task ConfirmInterest_SetsStatusConfirmedAndTimestamp()

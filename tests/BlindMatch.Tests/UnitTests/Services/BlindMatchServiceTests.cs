@@ -14,8 +14,6 @@ namespace BlindMatch.Tests.UnitTests.Services;
 
 public class BlindMatchServiceTests
 {
-    // ── Helpers ──────────────────────────────────────────────────────────────
-
     private static ApplicationDbContext CreateContext() =>
         new(new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -33,7 +31,6 @@ public class BlindMatchServiceTests
             audit?.Object   ?? Mock.Of<IAuditService>(),
             MockHelpers.CreateNullLogger<BlindMatchService>());
 
-    /// <summary>Seeds Student → Proposal → SupervisorInterest in the correct order.</summary>
     private static void SeedValidScenario(
         ApplicationDbContext ctx,
         string studentId     = "stu-1",
@@ -66,8 +63,6 @@ public class BlindMatchServiceTests
         return mock;
     }
 
-    // ── Guard: interest not found ─────────────────────────────────────────────
-
     [Fact]
     public async Task ConfirmInterest_InterestNotFound_ReturnsFailure()
     {
@@ -79,8 +74,6 @@ public class BlindMatchServiceTests
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().Be("Interest record not found.");
     }
-
-    // ── Guard: wrong supervisor ───────────────────────────────────────────────
 
     [Fact]
     public async Task ConfirmInterest_WrongSupervisorId_ReturnsFailure()
@@ -95,8 +88,6 @@ public class BlindMatchServiceTests
         result.Error.Should().Be("You are not authorised to confirm this interest.");
     }
 
-    // ── Guard: already confirmed ──────────────────────────────────────────────
-
     [Fact]
     public async Task ConfirmInterest_AlreadyConfirmed_ReturnsFailure()
     {
@@ -110,8 +101,6 @@ public class BlindMatchServiceTests
         result.Error.Should().Be("This interest has already been confirmed.");
     }
 
-    // ── Guard: proposal already matched ──────────────────────────────────────
-
     [Fact]
     public async Task ConfirmInterest_ProposalAlreadyMatched_ReturnsFailure()
     {
@@ -124,8 +113,6 @@ public class BlindMatchServiceTests
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().Be("This proposal has already been matched with another supervisor.");
     }
-
-    // ── Guard: supervisor at capacity ─────────────────────────────────────────
 
     [Fact]
     public async Task ConfirmInterest_NoCapacity_ReturnsFailure()
@@ -142,8 +129,6 @@ public class BlindMatchServiceTests
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().Be("You have reached your maximum project capacity and cannot take on more projects.");
     }
-
-    // ── Happy path: DB state after confirm ────────────────────────────────────
 
     [Fact]
     public async Task ConfirmInterest_ValidInput_CreatesMatchAndReveal()
@@ -174,8 +159,6 @@ public class BlindMatchServiceTests
         interest.ConfirmedAt.Should().NotBeNull();
     }
 
-    // ── Happy path: post-commit notifications ─────────────────────────────────
-
     [Fact]
     public async Task ConfirmInterest_ValidInput_CallsNotificationAndAudit()
     {
@@ -198,8 +181,6 @@ public class BlindMatchServiceTests
         audit.Verify(a => a.LogAsync("ConfirmInterest", "Match", It.IsAny<string?>(), "sup-1", It.IsAny<string?>()), Times.Once);
     }
 
-    // ── Happy path: supervisor project count incremented ─────────────────────
-
     [Fact]
     public async Task ConfirmInterest_ValidInput_IncrementsProjectCount()
     {
@@ -213,13 +194,9 @@ public class BlindMatchServiceTests
         supRepo.Verify(r => r.IncrementProjectCountAsync("sup-1"), Times.Once);
     }
 
-    // ── Exception during SaveChanges → failure returned ──────────────────────
-
     [Fact]
     public async Task ConfirmInterest_DbException_ReturnsFailure()
     {
-        // Seed into a normal context first, then open a ThrowingDbContext on
-        // the same InMemory database so SaveChangesAsync throws mid-transaction.
         var dbName = Guid.NewGuid().ToString();
         var opts   = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(dbName)
@@ -243,8 +220,6 @@ public class BlindMatchServiceTests
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().Be("An unexpected error occurred. No changes were saved. Please try again.");
     }
-
-    // ── Inner helper: context that throws on SaveChanges ─────────────────────
 
     private sealed class ThrowingDbContext(DbContextOptions<ApplicationDbContext> options)
         : ApplicationDbContext(options)

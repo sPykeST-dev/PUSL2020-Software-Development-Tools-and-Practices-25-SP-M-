@@ -46,7 +46,7 @@ public class UserManagementController : Controller
     {
         if (!ModelState.IsValid) return View(model);
 
-        // RULE: Admins must never create Student accounts
+        // Admins must never create Student accounts — students self-register.
         if (model.Role == Roles.Student)
         {
             ModelState.AddModelError(nameof(model.Role),

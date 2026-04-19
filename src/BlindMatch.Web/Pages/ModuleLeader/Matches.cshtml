@@ -30,21 +30,18 @@ else
                 <div class="card-body p-4">
                     <div class="row g-3">
 
-                        @* Project + Title *@
                         <div class="col-lg-4">
                             <div style="font-size:.67rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.25rem">@match.ProjectCode</div>
                             <div style="font-size:.9rem;font-weight:600;color:var(--text);line-height:1.4">@match.ProposalTitle</div>
                             <div style="font-size:.75rem;color:var(--text-muted);margin-top:.35rem">@match.CreatedAt.ToLocalTime().ToString("d MMM yyyy, HH:mm")</div>
                         </div>
 
-                        @* Student *@
                         <div class="col-sm-6 col-lg-4">
                             <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:.4rem">Student</div>
                             <div style="font-size:.875rem;font-weight:600;color:var(--text)">@match.StudentName</div>
                             <div style="font-size:.8rem;color:var(--text-muted)">@match.StudentEmail</div>
                         </div>
 
-                        @* Supervisor *@
                         <div class="col-sm-6 col-lg-4">
                             <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:.4rem">Supervisor</div>
                             <div style="font-size:.875rem;font-weight:600;color:var(--text)">@match.SupervisorName</div>

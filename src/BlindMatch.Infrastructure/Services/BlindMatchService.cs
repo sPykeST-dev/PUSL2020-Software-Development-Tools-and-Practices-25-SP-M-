@@ -33,12 +33,9 @@ public class BlindMatchService : IBlindMatchService
 
     public async Task<Result> ConfirmInterestAsync(int interestId, string supervisorId)
     {
-        // Load the interest record with its related proposal
         var interest = await _context.SupervisorInterests
             .Include(i => i.Proposal)
             .FirstOrDefaultAsync(i => i.Id == interestId);
-
-        // Guard checks
 
         if (interest == null)
             return Result.Failure("Interest record not found.");
@@ -56,16 +53,12 @@ public class BlindMatchService : IBlindMatchService
         if (!hasCapacity)
             return Result.Failure("You have reached your maximum project capacity and cannot take on more projects.");
 
-        //Atomic transaction
-
         await using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            // 1. Mark interest as confirmed
             interest.Status = InterestStatus.Confirmed;
             interest.ConfirmedAt = DateTime.UtcNow;
 
-            // 2. Create the Match
             var match = new Match
             {
                 ProposalId = interest.ProposalId,
@@ -76,8 +69,8 @@ public class BlindMatchService : IBlindMatchService
             };
             _context.Matches.Add(match);
 
-            // 3. Create the IdentityReveal use the Match navigation property
-            //    so EF resolves the FK automatically without needing match.Id yet
+            // Use the navigation property so EF resolves the FK automatically
+            // without needing match.Id before SaveChanges.
             var reveal = new IdentityReveal
             {
                 Match = match,
@@ -86,27 +79,22 @@ public class BlindMatchService : IBlindMatchService
             };
             _context.IdentityReveals.Add(reveal);
 
-            // 4. Update the proposal status to Matched
             interest.Proposal.Status = ProposalStatus.Matched;
 
-            // 5. Flush all changes (interest, match, reveal, proposal) in one call
             await _context.SaveChangesAsync();
 
-            // 6. Increment supervisor's project count
-            //    This may call SaveChanges internally — that is fine inside a transaction
+            // IncrementProjectCountAsync may call SaveChanges internally;
+            // that is fine inside a transaction.
             await _supervisorRepository.IncrementProjectCountAsync(supervisorId);
 
-            // now changes are durable
             await transaction.CommitAsync();
 
             _logger.LogInformation(
                 "Identity reveal complete. Match #{MatchId} created for Proposal #{ProposalId}.",
                 match.Id, interest.ProposalId);
 
-            // Post-commit: notifications and audit
-            // These run OUTSIDE the transaction intentionally.
-            // A failed notification must NOT undo a successful match.
-
+            // Post-commit: notifications and audit run OUTSIDE the transaction
+            // intentionally — a failed notification must not undo a successful match.
             await _notificationService.NotifyMatchCreatedAsync(
                 interest.Proposal.StudentId, supervisorId, interest.ProposalId);
 

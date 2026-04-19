@@ -4,8 +4,6 @@ namespace BlindMatch.Tests.UnitTests.Core;
 
 public class ProposalEntityTests
 {
-    // ── TC-PROP-01 ────────────────────────────────────────────────────────────
-
     [Fact]
     public void NewProposal_HasNullWithdrawnAt()
     {
@@ -13,8 +11,6 @@ public class ProposalEntityTests
 
         proposal.WithdrawnAt.Should().BeNull();
     }
-
-    // ── TC-PROP-02 ────────────────────────────────────────────────────────────
 
     [Fact]
     public void NewProposal_HasNonNullUpdatedAt()
@@ -24,8 +20,6 @@ public class ProposalEntityTests
 
         proposal.UpdatedAt.Should().BeOnOrAfter(before);
     }
-
-    // ── TC-PROP-03 ────────────────────────────────────────────────────────────
 
     [Fact]
     public void NewProposal_HasEmptyInterestsCollection()
